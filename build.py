@@ -75,24 +75,40 @@ def header(prefix='', current='', home=None):
         cur = ' aria-current="page"' if key == current else ''
         return f'<a href="{href}" data-nav="{key}"{cur}>{label}</a>'
     return f'''<header class="site-header" id="top"><div class="wrap header-inner">
-<a class="brand" href="{prefix or './'}{'index.html' if prefix else ''}"><span class="brand-mark" aria-hidden="true">{e(C['initials'])}</span><span class="brand-name">{e(C['name'])}</span></a>
+<a class="brand" href="{prefix or './'}{'index.html' if prefix else ''}"><span class="brand-full">{e(C['name'])}</span><span class="brand-short" aria-hidden="true">{e(C['initials'])}</span></a>
 <nav class="site-nav" aria-label="Main">{nav(home + '#work', 'Work', 'work')}{nav(home + '#about', 'About', 'about')}{nav(prefix + 'resume.html', 'Resume', 'resume')}{nav(home + '#contact', 'Contact', 'contact')}</nav>
 {ext(C['github'], 'GitHub', 'header-cta')}
 </div></header>'''
 
 
+# ---------------------------------------------------------------- hand-drawn icons (inline SVG, ink = currentColor)
+
+ICONS = {
+    'peace': '<svg class="ico ico-peace" viewBox="0 0 64 64" aria-hidden="true"><g fill="var(--paper)" stroke="currentColor" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round"><rect x="15.5" y="4" width="13" height="34" rx="6.5" transform="rotate(-13 22 36)"/><rect x="33" y="3" width="13" height="35" rx="6.5" transform="rotate(12 39.5 36)"/><path d="M14 40c0-6 4-9 10-9h17c6 0 9 4 9 10v6c0 8-6 14-14 14h-8c-8 0-14-6-14-14Z"/><path d="M34 39.5c4-1.6 8.5-1.6 12.5 0" fill="none"/><path d="M9.5 45.5c0-3 2.4-5 5.4-4.6l17 2.4c3 .4 4.8 3 4.3 6-.5 2.8-3.2 4.6-6 4.2l-16.4-2.4c-2.7-.4-4.3-2.8-4.3-5.6Z"/></g></svg>',
+    'chip': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="12" width="24" height="24" rx="4"/><rect x="19" y="19" width="10" height="10" rx="1.5"/><path d="M18 5v7M24 5v7M30 5v7M18 36v7M24 36v7M30 36v7M5 18h7M5 24h7M5 30h7M36 18h7M36 24h7M36 30h7"/></g></svg>',
+    'mesh': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M10 37 24 11 38 37 10 37M24 11v17M10 37l14-9 14 9"/></g><g fill="var(--paper)" stroke="currentColor" stroke-width="3.4"><circle cx="24" cy="11" r="5"/><circle cx="10" cy="37" r="5"/><circle cx="38" cy="37" r="5"/><circle cx="24" cy="28" r="4"/></g></svg>',
+    'braces': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7c-5 0-6.5 2.5-6.5 6.5v6c0 2.8-1.6 4.5-5 4.5 3.4 0 5 1.7 5 4.5v6c0 4 1.5 6.5 6.5 6.5M30 7c5 0 6.5 2.5 6.5 6.5v6c0 2.8 1.6 4.5 5 4.5-3.4 0-5 1.7-5 4.5v6c0 4-1.5 6.5-6.5 6.5"/></g></svg>',
+    'spark': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><path d="M20 7c1.4 8.6 4.4 11.6 13 13-8.6 1.4-11.6 4.4-13 13-1.4-8.6-4.4-11.6-13-13 8.6-1.4 11.6-4.4 13-13Z"/><path d="M37 29c.7 4 2 5.3 6 6-4 .7-5.3 2-6 6-.7-4-2-5.3-6-6 4-.7 5.3-2 6-6Z"/></g></svg>',
+    'cursor': '<svg class="cursor3d" viewBox="0 0 80 80" aria-hidden="true"><defs><filter id="cur-shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="3" dy="6" stdDeviation="3.5" flood-color="#18202E" flood-opacity=".35"/></filter><linearGradient id="cur-fill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a4252"/><stop offset="1" stop-color="#0d121b"/></linearGradient></defs><path filter="url(#cur-shadow)" d="M14 8 L14 62 L28 49 L38 70 L48 65 L38 45 L57 45 Z" fill="url(#cur-fill)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg>',
+}
+
+
 def contact(prefix=''):
     return f'''<section class="contact" id="contact" aria-labelledby="contact-title"><div class="wrap contact-inner">
-<h2 id="contact-title">Let’s talk</h2>
-<p class="contact-lead">Email is the fastest way to reach me.</p>
-<a class="contact-mail" href="mailto:{e(C['email'])}">{e(C['email']).replace('@', '<wbr>@')}</a>
-<div class="contact-actions"><button class="btn btn-light" type="button" data-copy-email="{e(C['email'])}">Copy email</button><a class="btn btn-ghost-light" href="{prefix}{e(C['cv_pdf'])}" download>Download CV (PDF)</a>{ext(C['linkedin'], 'LinkedIn', 'text-link-light')}{ext(C['github'], 'GitHub', 'text-link-light')}</div>
+<h2 id="contact-title" class="contact-title"><span class="ct-line">Interested in {ICONS['peace']}</span><span class="ct-line">building together?</span></h2>
+<p class="contact-lead">Contact me:</p>
+<p class="contact-mail-row"><a class="contact-mail" href="mailto:{e(C['email'])}">{e(C['email']).replace('@', '<wbr>@')}</a>{ICONS['cursor']}</p>
+<div class="contact-actions"><button class="btn btn-dark" type="button" data-copy-email="{e(C['email'])}">Copy email</button><a class="btn btn-outline" href="{prefix}{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
 <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
 </div></section>'''
 
 
 def footer(prefix=''):
-    return f'''<footer class="site-footer"><div class="wrap footer-inner"><p>© <span data-year>{date.today().year}</span> {e(C['name'])}</p><p>{e(C['location'])}</p>{ext(C['github'] + '/TitovMykhailo.github.io', 'Site source')}<a href="#top">Back to top</a></div></footer>
+    return f'''<footer class="site-footer"><div class="wrap footer-inner">
+<p class="footer-made">Designed &amp; built<br>by {e(C['name'])}</p>
+<p class="footer-pills">{ext(C['linkedin'], 'LinkedIn', 'pill-link')}{ext(C['github'], 'GitHub', 'pill-link')}{ext(C['github'] + '/TitovMykhailo.github.io', 'Site source', 'pill-link')}</p>
+<p class="footer-end">© <span data-year>{date.today().year}</span> {e(C['name'])}<br><a href="#top">Back to top ↑</a></p>
+</div></footer>
 </body></html>'''
 
 
@@ -204,13 +220,57 @@ def media(p, prefix='', large=False, eager=False):
 
 # ---------------------------------------------------------------- home page parts
 
-def stack():
-    bands = ''
-    for layer in C['layers']:
-        links = ''.join(f'<li><a href="projects/{p}.html">{e(P[p]["title"])}</a></li>' for p in layer['projects'])
-        bands += f'''<li class="band tint-{e(layer['color'])}"><div class="band-head"><h3>{e(layer['name'])}</h3><p>{e(layer['note'])}</p></div><ul class="band-projects">{links}</ul></li>'''
-    return f'''<figure class="stack" aria-labelledby="stack-caption"><ol class="bands">{bands}</ol>
-<figcaption id="stack-caption">Every project, by the layer of the system it works at.</figcaption></figure>'''
+# ---------------------------------------------------------------- playful hero + intro
+
+def hero_dots():
+    import random
+    rnd = random.Random(7)
+    dots = ''.join(f'<circle cx="{rnd.uniform(0, 1600):.0f}" cy="{rnd.uniform(0, 760):.0f}" r="{rnd.choice((1.6, 2, 2.4, 3))}"/>' for _ in range(150))
+    return f'<svg class="hero-dots" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-hidden="true">{dots}</svg>'
+
+
+def hero_type():
+    return f'''<section class="hero" aria-labelledby="hero-title">
+{hero_dots()}
+<div class="wrap hero-stage">
+<h1 id="hero-title" class="sr-only">{e(C['name'])}, {e(C['hero_words'][0].lower())} {e(C['hero_words'][1].lower())} {e(C['hero_words'][2].lower())}</h1>
+<div class="hero-type" aria-hidden="true">
+<span class="ht-line ht-dots">{e(C['hero_words'][0])}</span>
+<span class="ht-line ht-orange">S<button class="ht-toggle" type="button" tabindex="-1" aria-pressed="false" data-toggle><span class="ht-knob"></span></button>FTWARE</span>
+<span class="ht-line ht-black">ENG<span class="ht-capsule"><img src="{e(C['hero_capsule'])}" alt="" width="360" height="986" decoding="async"></span>NEER<span class="ht-sticker"><span>&lt;/&gt;</span></span></span>
+
+</div>
+</div>
+<div class="wrap hero-foot">
+<p class="hero-places-label"><span class="status-dot" aria-hidden="true"></span>{e(C['status'])}. Studying and building at</p>
+<div class="marquee" aria-label="Places">{names_track()}{names_track(hidden=True)}</div>
+<div class="hero-actions"><a class="btn btn-signal" href="#work">See the projects</a><a class="btn btn-outline" href="{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
+</div>
+</section>'''
+
+
+def names_track(hidden=False):
+    items = ''.join(f'<li class="nm-{e(n["style"])}">{e(n["name"])}</li>' for n in C['places'])
+    attr = ' aria-hidden="true"' if hidden else ''
+    return f'<ul class="marquee-track"{attr}>{items}</ul>'
+
+
+def intro():
+    i = C['intro']
+    avatar = (f'<img class="intro-avatar" src="{e(C.get("photo_avatar") or C["photo"])}" alt="" width="240" height="240">' if C.get('photo')
+              else f'<span class="intro-avatar intro-avatar-mono" aria-hidden="true">{e(C["initials"])}</span>')
+    text = (f'Hi, I’m {avatar} {e(C["short_name"])}{ICONS["peace"]}, an ICT student at <span class="intro-pill">{e(i["pill"])}</span> '
+            f'building software from bits{ICONS["chip"]}, networks{ICONS["mesh"]} and APIs{ICONS["braces"]} to AI agents{ICONS["spark"]}.')
+    skills = ''
+    for sk in i['skills']:
+        style = f' style="--r:{sk["rotate"]}deg"' if sk.get('rotate') else ''
+        skills += f'<li class="sk sk-{e(sk["style"])}"{style}>{e(sk["name"])}</li>'
+    return f'''<section class="intro" id="about-intro" aria-label="Introduction"><div class="wrap intro-inner">
+<p class="intro-text">{text}</p>
+<svg class="scroll-badge" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="badge-circle" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0"/></defs><text><textPath href="#badge-circle">SCROLL ✦ SCROLL ✦ SCROLL ✦ </textPath></text></svg>
+<p class="skills-label">with my skills in:</p>
+<ul class="skill-cloud">{skills}</ul>
+</div></section>'''
 
 
 def metrics(p, cls='metrics'):
@@ -274,7 +334,7 @@ def hackathons():
 
 def portrait(prefix=''):
     if C.get('photo'):
-        return f'<img class="portrait" src="{prefix}{e(C["photo"])}" width="480" height="560" alt="Portrait of {e(C["name"])}">'
+        return f'<img class="portrait" src="{prefix}{e(C["photo"])}" width="640" height="800" alt="Portrait of {e(C["name"])}" loading="lazy" decoding="async">'
     return f'<div class="portrait portrait-mono" aria-hidden="true"><span>{e(C["initials"])}</span></div>'
 
 
@@ -328,18 +388,8 @@ def build_index():
     out = head(f"{C['name']} — {C['role']}", C['meta_description'], extra=json_ld())
     out += header()
     out += f'''<main id="main">
-<section class="hero" aria-labelledby="hero-title"><div class="wrap">
-<p class="status"><span class="status-dot" aria-hidden="true"></span>{e(C['status'])} in {e(C['location'].split(',')[0])}</p>
-<h1 id="hero-title" class="display">{e(C['name'])}</h1>
-<div class="hero-grid">
-<div class="hero-copy">
-<p class="hero-role">{e(C['role'])}</p>
-<p class="hero-lead">{e(C['lead'])}</p>
-<div class="hero-actions"><a class="btn btn-signal" href="#work">See the projects</a><a class="btn btn-outline" href="{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
-<p class="hero-links">{ext(C['github'], 'GitHub', 'text-link')}{ext(C['linkedin'], 'LinkedIn', 'text-link')}<a class="text-link" href="mailto:{e(C['email'])}">Email</a></p>
-</div>
-{stack()}
-</div></div></section>
+{hero_type()}
+{intro()}
 <section class="section work" id="work" aria-labelledby="work-title"><div class="wrap">
 <h2 id="work-title">Selected work</h2><p class="section-lead">Four projects in depth. Screens and numbers come from the code itself.</p>
 <div class="cases">{''.join(case_card(p, i) for i, p in enumerate(FEATURED))}</div>
@@ -433,43 +483,78 @@ def build_project(p, i):
     (ROOT / 'projects' / f"{p['id']}.html").write_text(out, encoding='utf-8')
 
 
-# ---------------------------------------------------------------- resume
+# ---------------------------------------------------------------- CV
+# resume.html (public) and tailored variants such as cv/treehacks.html (unlisted).
+# make_assets.py prints each variant to its PDF.
+
+def cv_project(p):
+    layer = layer_of(p)
+    src = f' · <a href="{e(p["repo"])}">{e(p["repo"].replace("https://", ""))}</a>' if p['repo'] else ''
+    points = ''.join(f'<li>{e(x)}</li>' for x in p['cv_points'])
+    return f'''<li class="cv-item"><div class="cv-row"><h3>{e(p['title'])}</h3><span class="cv-tag tint-{e(layer['color'])}">{e(layer['name'])}</span><span class="cv-year">{e(p['year'])}</span></div>
+<p class="cv-outcome">{e(p['outcome'])}.</p><ul class="cv-points">{points}</ul><p class="cv-foot">{e(', '.join(p['stack'][:5]))}{src}</p></li>'''
+
+
+def cv_hackathon(h):
+    badge = f'<span class="cv-badge">{e(h["result"])}</span>' if h.get('result') else ''
+    return f'''<li class="cv-item"><div class="cv-row"><h3>{e(h['event'])}</h3>{badge}<span class="cv-year">{e(h.get('year') or '')}</span></div>
+<p class="cv-text">{e(h['cv'])}</p></li>'''
+
+
+def cv_sections(v):
+    out = {}
+    out['projects'] = f'<section class="cv-section"><h2>{e(v["projects_title"])}</h2><ul class="cv-list">{"".join(cv_project(P[i]) for i in v["projects"])}</ul></section>'
+    out['hackathons'] = f'<section class="cv-section"><h2>Hackathons</h2><ul class="cv-list">{"".join(cv_hackathon(h) for h in C.get("hackathons", []))}</ul></section>'
+    out['more'] = '<section class="cv-section"><h2>More projects</h2><ul class="cv-more">' + ''.join(
+        f'<li><b>{e(P[i]["title"])}</b> — {e(P[i]["subtitle"])}</li>' for i in v['more']) + '</ul></section>'
+    return ''.join(out[k] for k in v['order'])
+
+
+def cv_sidebar(v):
+    a = C['about']
+    blocks = {}
+    blocks['education'] = '<div class="cv-block"><h2>Education</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(x["school"])}</b><span>{e(x["program"])}{(", " + e(x["years"])) if x.get("years") else ""}</span></li>' for x in C['education']) + '</ul></div>'
+    blocks['skills'] = '<div class="cv-block"><h2>Skills</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(g["group"])}</b><span>{e(", ".join(g["items"]))}</span></li>' for g in C['toolbox']) + '</ul></div>'
+    blocks['languages'] = ('<div class="cv-block"><h2>Languages</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(l["name"])}</b><span>{e(l["level"])}</span></li>' for l in a['languages']) + '</ul></div>') if a.get('languages') else ''
+    blocks['now'] = (f'<div class="cv-block"><h2>Right now</h2><p class="cv-now">{e(v["now"])}</p></div>') if v.get('now') else ''
+    blocks['tools'] = ('<div class="cv-block"><h2>Tools</h2><ul class="cv-chips">' + ''.join(f'<li>{e(x)}</li>' for x in v['tools']) + '</ul></div>') if v.get('tools') else ''
+    blocks['team'] = ('<div class="cv-block"><h2>What I bring</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(t["title"])}</b><span>{e(t["text"])}</span></li>' for t in v['team']) + '</ul></div>') if v.get('team') else ''
+    blocks['tracks'] = ('<div class="cv-block"><h2>Tracks I’d build for</h2><ul class="cv-chips">' + ''.join(
+        f'<li>{e(t)}</li>' for t in v['tracks']) + '</ul></div>') if v.get('tracks') else ''
+    return ''.join(blocks[k] for k in v['sidebar'])
+
+
+def cv_article(v):
+    site = SITE.replace('https://', '')
+    layers = ''.join(f'<span class="tint-{e(l["color"])}">{e(l["name"])}</span>' for l in reversed(C['layers']))
+    return f'''<article class="cv" aria-label="Resume of {e(C['name'])}">
+<header class="cv-head"><div class="cv-id"><span class="cv-mark" aria-hidden="true">{e(C['initials'])}</span><div><h1>{e(C['name'])}</h1><p class="cv-headline">{e(v['headline'])}</p></div></div>
+<ul class="cv-contacts"><li><a href="mailto:{e(C['email'])}">{e(C['email'])}</a></li><li><a href="{e(SITE)}">{e(site)}</a></li><li><a href="{e(C['github'])}">{e(C['github'].replace('https://', ''))}</a></li><li><a href="{e(C['linkedin'])}">{e(C['linkedin'].replace('https://www.', ''))}</a></li><li>{e(C['location'])}</li></ul></header>
+<div class="cv-layers" aria-hidden="true">{layers}</div>
+<div class="cv-body"><div class="cv-main"><section class="cv-section"><h2>Profile</h2><p class="cv-profile">{e(v['profile'])}</p></section>{cv_sections(v)}</div>
+<aside class="cv-side">{cv_sidebar(v)}</aside></div>
+</article>'''
+
 
 def build_resume():
-    a = C['about']
-    def proj_line(p):
-        m = '; '.join(f'{x["value"]} {x["label"]}' for x in p['metrics'] if not re.search(r'(?<![\d.])' + re.escape(x['value']) + r'(?!\d)', p['outcome']))
-        return f'''<li><div class="cv-row"><b>{e(p['title'])}</b><span>{e(p['year'])}</span></div><p>{e(p['outcome'])}.{(' ' + e(m) + '.') if m else ''}</p><p class="cv-stack">{e(', '.join(p['stack'][:6]))}</p></li>'''
-    others = [p for p in PROJECTS if p not in FEATURED]
-    def cv_hack(h):
-        if h.get('project'):
-            return f'{e(h["title"])} (see Selected projects).'
-        if h.get('points'):
-            return f'{e(h["title"])}. {e(h["summary"].split(". ")[-1])}'
-        return e(h['summary'])
-    skills = ''.join(f'<li><b>{e(g["group"])}</b><span>{e(", ".join(g["items"]))}</span></li>' for g in C['toolbox'])
-    edu = ''.join(f'<li><div class="cv-row"><b>{e(x["school"])}</b><span>{e(x["years"] or "")}</span></div><p>{e(x["program"])}</p></li>' for x in C['education'])
-    langs = ''
-    if a.get('languages'):
-        langs = '<section><h2>Languages</h2><p>' + ', '.join(f'{e(l["name"])} ({e(l["level"])})' for l in a['languages']) + '</p></section>'
-    out = head(f"Resume — {C['name']}", f"Resume of {C['name']}, {C['role']} in Bratislava.", '', 'resume.html')
-    out += header('', 'resume', home='index.html')
-    out += f'''<main id="main" class="resume-page"><div class="wrap">
-<div class="resume-tools"><p>A one-page summary. The PDF has the same content.</p><div><a class="btn btn-dark" href="{e(C['cv_pdf'])}" download>Download PDF</a><button class="btn btn-outline" type="button" data-print>Print</button></div></div>
-<article class="cv">
-<header class="cv-head"><div><h1>{e(C['name'])}</h1><p class="cv-role">{e(C['role'])}, {e(C['location'])}</p></div>
-<ul class="cv-contacts"><li><a href="mailto:{e(C['email'])}">{e(C['email'])}</a></li><li><a href="{e(SITE)}">{e(SITE.replace('https://', ''))}</a></li><li><a href="{e(C['github'])}">{e(C['github'].replace('https://', ''))}</a></li><li><a href="{e(C['linkedin'])}">{e(C['linkedin'].replace('https://www.', ''))}</a></li></ul></header>
-<section><h2>Profile</h2><p>{e(a['bio'][0])} {e(a['bio'][2].split('. I also')[0].rstrip('.'))}. {e(a['looking_for'])}</p></section>
-<section><h2>Education</h2><ul class="cv-list">{edu}</ul></section>
-<section><h2>Selected projects</h2><ul class="cv-list">{''.join(proj_line(p) for p in FEATURED)}</ul></section>
-<section><h2>Hackathons</h2><ul class="cv-list cv-compact">{''.join(f'<li><div class="cv-row"><b>{e(h["event"])}{(" — " + e(h["result"])) if h.get("result") else ""}</b><span>{e(h.get("year") or "")}</span></div><p>{cv_hack(h)}</p></li>' for h in C.get('hackathons', []))}</ul></section>
-<section><h2>More projects</h2><ul class="cv-list cv-compact">{''.join(f'<li><p><b class="cv-ink">{e(p["title"])}</b> — {e(p["outcome"])}.</p></li>' for p in others)}</ul></section>
-<section><h2>Skills</h2><ul class="cv-skills">{skills}</ul></section>
-{langs}
-</article>
-</div></main>'''
-    out += footer()
-    (ROOT / 'resume.html').write_text(out, encoding='utf-8')
+    for key, v in C['cv_variants'].items():
+        depth = v['page'].count('/')
+        prefix = '../' * depth
+        tools = f'<div class="resume-tools"><p>{"One page. The PDF has the same content." if key == "main" else "Tailored resume. The PDF has the same content."}</p><div><a class="btn btn-dark" href="{prefix}{e(v["pdf"])}" download>Download PDF</a><button class="btn btn-outline" type="button" data-print>Print</button></div></div>'
+        if key == 'main':
+            out = head(f"Resume — {C['name']}", f"Resume of {C['name']}, {C['role']} in Bratislava.", prefix, v['page'])
+            out += header(prefix, 'resume', home=f'{prefix}index.html')
+            out += f'<main id="main" class="resume-page"><div class="wrap">{tools}{cv_article(v)}</div></main>' + footer(prefix)
+        else:
+            out = head(f"Resume — {C['name']}", f"Resume of {C['name']}.", prefix, v['page'], extra='\n<meta name="robots" content="noindex">')
+            out += f'<main id="main" class="resume-page resume-solo"><div class="wrap">{tools}{cv_article(v)}</div></main></body></html>'
+        target = ROOT / v['page']
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(out, encoding='utf-8')
 
 
 # ---------------------------------------------------------------- extras

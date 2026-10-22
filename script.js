@@ -54,3 +54,15 @@ document.querySelectorAll('[data-print]').forEach(button => button.addEventListe
 
 // Keep the footer year current.
 document.querySelectorAll('[data-year]').forEach(el => { el.textContent = String(new Date().getFullYear()); });
+
+// The toggle that stands in for the "O" in SOFTWARE: flip the bit.
+document.querySelectorAll('[data-toggle]').forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    toggle.setAttribute('aria-pressed', String(toggle.getAttribute('aria-pressed') !== 'true'));
+  });
+});
+
+// SVG (SMIL) animations ignore CSS, so pause them for people who prefer less motion.
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document.querySelectorAll('svg').forEach(svg => { if (svg.pauseAnimations) svg.pauseAnimations(); });
+}
