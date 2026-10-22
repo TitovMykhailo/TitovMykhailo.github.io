@@ -122,7 +122,7 @@ a:hover>.ext{transform:translate(2px,-2px)}
 .ico{display:inline-block;width:.86em;height:.86em;vertical-align:-.1em;margin:0 0 0 .16em}
 .ico-peace{width:1.02em;height:1.02em;vertical-align:-.14em;margin-left:.08em}
 .intro-text .ico-peace{margin-right:-.1em}
-.intro-avatar{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em;border-radius:.16em;object-fit:cover;transform:rotate(-3deg)}
+.intro-avatar{display:inline-block;width:1.08em;height:1.08em;vertical-align:-.2em;border-radius:.16em;object-fit:cover;transform:rotate(-3deg);box-shadow:0 0 0 .045em var(--signal)}
 .intro-avatar-mono{display:inline-grid;place-items:center;font-size:.4em;width:2.5em;height:2.5em;vertical-align:-.24em;border-radius:.4em;background:var(--signal);color:var(--ink);font-weight:800;font-stretch:125%;letter-spacing:.01em}
 .intro-pill{display:inline-block;padding:0 .3em;border:.05em solid currentColor;border-radius:999px;font-weight:650;line-height:1.08}
 .scroll-badge{position:absolute;right:0;top:0;width:118px;height:118px;animation:spin 20s linear infinite}
@@ -289,7 +289,7 @@ a:hover>.ext{transform:translate(2px,-2px)}
 .about{background:var(--paper-2)}
 .about-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(32px,6vw,96px)}
 .about-side{position:sticky;top:100px;align-self:start}
-.portrait{width:100%;max-width:300px;aspect-ratio:1;border-radius:var(--r-lg);object-fit:cover}
+.portrait{width:100%;max-width:300px;aspect-ratio:4/5;height:auto;border-radius:var(--r-lg);object-fit:cover}
 .portrait-mono{display:grid;place-items:center;background:var(--signal)}
 .portrait-mono span{font-size:clamp(72px,9vw,128px);font-weight:800;font-stretch:125%;letter-spacing:-.03em;color:var(--ink)}
 .about-name{font-size:20px;font-weight:700;font-stretch:110%;margin-top:18px}

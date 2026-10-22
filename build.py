@@ -257,7 +257,7 @@ def names_track(hidden=False):
 
 def intro():
     i = C['intro']
-    avatar = (f'<img class="intro-avatar" src="{e(C["photo"])}" alt="" width="96" height="96">' if C.get('photo')
+    avatar = (f'<img class="intro-avatar" src="{e(C.get("photo_avatar") or C["photo"])}" alt="" width="240" height="240">' if C.get('photo')
               else f'<span class="intro-avatar intro-avatar-mono" aria-hidden="true">{e(C["initials"])}</span>')
     text = (f'Hi, I’m {avatar} {e(C["short_name"])}{ICONS["peace"]}, an ICT student at <span class="intro-pill">{e(i["pill"])}</span> '
             f'building software from bits{ICONS["chip"]}, networks{ICONS["mesh"]} and APIs{ICONS["braces"]} to AI agents{ICONS["spark"]}.')
@@ -334,7 +334,7 @@ def hackathons():
 
 def portrait(prefix=''):
     if C.get('photo'):
-        return f'<img class="portrait" src="{prefix}{e(C["photo"])}" width="480" height="560" alt="Portrait of {e(C["name"])}">'
+        return f'<img class="portrait" src="{prefix}{e(C["photo"])}" width="640" height="800" alt="Portrait of {e(C["name"])}" loading="lazy" decoding="async">'
     return f'<div class="portrait portrait-mono" aria-hidden="true"><span>{e(C["initials"])}</span></div>'
 
 

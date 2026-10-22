@@ -9,7 +9,7 @@
   "email": "titov.mykhailo.work@gmail.com",
   "github": "https://github.com/TitovMykhailo",
   "linkedin": "https://www.linkedin.com/in/titovmykhailo",
-  "photo": null,
+  "photo": "assets/photo.webp",
   "cv_pdf": "assets/Mykhailo_Titov_CV.pdf",
   "lead": "I build across the stack — from a Verilog error-correcting decoder and a mesh-routing protocol to Spring Boot APIs and Python agents on top of LLMs.",
   "meta_description": "Mykhailo Titov — software engineer and ICT student in Bratislava. Case studies in Java/Spring Boot, React, network protocols, Verilog and AI automation.",
@@ -1011,5 +1011,6 @@
       }
     ]
   },
-  "hero_capsule": "assets/hero-capsule.webp"
+  "hero_capsule": "assets/hero-capsule.webp",
+  "photo_avatar": "assets/photo-avatar.webp"
 }
