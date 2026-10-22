@@ -229,22 +229,7 @@ def hero_dots():
     return f'<svg class="hero-dots" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-hidden="true">{dots}</svg>'
 
 
-def mesh_card():
-    nodes = [(36, 80), (96, 30), (152, 86), (214, 34), (266, 88)]
-    edges = [(0, 1), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (0, 2)]
-    lines = ''.join(f'<line x1="{nodes[a][0]}" y1="{nodes[a][1]}" x2="{nodes[b][0]}" y2="{nodes[b][1]}"/>' for a, b in edges)
-    circles = ''.join(f'<circle class="mc-node" style="--d:{i * .45}s" cx="{x}" cy="{y}" r="9"/>' for i, (x, y) in enumerate(nodes))
-    path1 = 'M36 80 L96 30 L214 34 L266 88'
-    path2 = 'M266 88 L152 86 L36 80'
-    return f'''<svg class="mesh-card" viewBox="0 0 300 118" aria-hidden="true">
-<g class="mc-edges">{lines}</g>{circles}
-<circle class="mc-packet" r="5"><animateMotion dur="3.2s" repeatCount="indefinite" path="{path1}"/></circle>
-<circle class="mc-packet mc-packet-2" r="4"><animateMotion dur="2.6s" begin="1s" repeatCount="indefinite" path="{path2}"/></circle></svg>'''
-
-
 def hero_type():
-    capsule_bands = ''.join(f'<i class="tint-{e(l["color"])}"></i>' for l in C['layers'])
-    tagline = C.get('hero_tagline', {})
     return f'''<section class="hero" aria-labelledby="hero-title">
 {hero_dots()}
 <div class="wrap hero-stage">
@@ -252,8 +237,8 @@ def hero_type():
 <div class="hero-type" aria-hidden="true">
 <span class="ht-line ht-dots">{e(C['hero_words'][0])}</span>
 <span class="ht-line ht-orange">S<button class="ht-toggle" type="button" tabindex="-1" aria-pressed="false" data-toggle><span class="ht-knob"></span></button>FTWARE</span>
-<span class="ht-line ht-black">ENG<span class="ht-capsule">{capsule_bands}<b></b></span>NEER<span class="ht-sticker"><span>&lt;/&gt;</span></span></span>
-<figure class="hero-card"><div class="hero-card-art">{mesh_card()}</div><figcaption lang="{e(tagline.get('lang', 'uk'))}">{e(tagline.get('before', ''))} <em>{e(tagline.get('accent', ''))}</em> {e(tagline.get('text', ''))}</figcaption></figure>
+<span class="ht-line ht-black">ENG<span class="ht-capsule"><img src="{e(C['hero_capsule'])}" alt="" width="360" height="986" decoding="async"></span>NEER<span class="ht-sticker"><span>&lt;/&gt;</span></span></span>
+
 </div>
 </div>
 <div class="wrap hero-foot">

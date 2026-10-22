@@ -934,12 +934,6 @@
     "Software",
     "Engineer"
   ],
-  "hero_tagline": {
-    "lang": "uk",
-    "before": "Український",
-    "accent": "SOFTWARE ENGINEER,",
-    "text": "що будує речі від бітів до штучного інтелекту."
-  },
   "places": [
     {
       "name": "STU FEI",
@@ -1016,5 +1010,6 @@
         "style": "amp"
       }
     ]
-  }
+  },
+  "hero_capsule": "assets/hero-capsule.webp"
 }
