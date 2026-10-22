@@ -75,24 +75,40 @@ def header(prefix='', current='', home=None):
         cur = ' aria-current="page"' if key == current else ''
         return f'<a href="{href}" data-nav="{key}"{cur}>{label}</a>'
     return f'''<header class="site-header" id="top"><div class="wrap header-inner">
-<a class="brand" href="{prefix or './'}{'index.html' if prefix else ''}"><span class="brand-mark" aria-hidden="true">{e(C['initials'])}</span><span class="brand-name">{e(C['name'])}</span></a>
+<a class="brand" href="{prefix or './'}{'index.html' if prefix else ''}"><span class="brand-full">{e(C['name'])}</span><span class="brand-short" aria-hidden="true">{e(C['initials'])}</span></a>
 <nav class="site-nav" aria-label="Main">{nav(home + '#work', 'Work', 'work')}{nav(home + '#about', 'About', 'about')}{nav(prefix + 'resume.html', 'Resume', 'resume')}{nav(home + '#contact', 'Contact', 'contact')}</nav>
 {ext(C['github'], 'GitHub', 'header-cta')}
 </div></header>'''
 
 
+# ---------------------------------------------------------------- hand-drawn icons (inline SVG, ink = currentColor)
+
+ICONS = {
+    'peace': '<svg class="ico ico-peace" viewBox="0 0 64 64" aria-hidden="true"><g fill="var(--paper)" stroke="currentColor" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round"><rect x="15.5" y="4" width="13" height="34" rx="6.5" transform="rotate(-13 22 36)"/><rect x="33" y="3" width="13" height="35" rx="6.5" transform="rotate(12 39.5 36)"/><path d="M14 40c0-6 4-9 10-9h17c6 0 9 4 9 10v6c0 8-6 14-14 14h-8c-8 0-14-6-14-14Z"/><path d="M34 39.5c4-1.6 8.5-1.6 12.5 0" fill="none"/><path d="M9.5 45.5c0-3 2.4-5 5.4-4.6l17 2.4c3 .4 4.8 3 4.3 6-.5 2.8-3.2 4.6-6 4.2l-16.4-2.4c-2.7-.4-4.3-2.8-4.3-5.6Z"/></g></svg>',
+    'chip': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="12" width="24" height="24" rx="4"/><rect x="19" y="19" width="10" height="10" rx="1.5"/><path d="M18 5v7M24 5v7M30 5v7M18 36v7M24 36v7M30 36v7M5 18h7M5 24h7M5 30h7M36 18h7M36 24h7M36 30h7"/></g></svg>',
+    'mesh': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M10 37 24 11 38 37 10 37M24 11v17M10 37l14-9 14 9"/></g><g fill="var(--paper)" stroke="currentColor" stroke-width="3.4"><circle cx="24" cy="11" r="5"/><circle cx="10" cy="37" r="5"/><circle cx="38" cy="37" r="5"/><circle cx="24" cy="28" r="4"/></g></svg>',
+    'braces': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7c-5 0-6.5 2.5-6.5 6.5v6c0 2.8-1.6 4.5-5 4.5 3.4 0 5 1.7 5 4.5v6c0 4 1.5 6.5 6.5 6.5M30 7c5 0 6.5 2.5 6.5 6.5v6c0 2.8 1.6 4.5 5 4.5-3.4 0-5 1.7-5 4.5v6c0 4-1.5 6.5-6.5 6.5"/></g></svg>',
+    'spark': '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><path d="M20 7c1.4 8.6 4.4 11.6 13 13-8.6 1.4-11.6 4.4-13 13-1.4-8.6-4.4-11.6-13-13 8.6-1.4 11.6-4.4 13-13Z"/><path d="M37 29c.7 4 2 5.3 6 6-4 .7-5.3 2-6 6-.7-4-2-5.3-6-6 4-.7 5.3-2 6-6Z"/></g></svg>',
+    'cursor': '<svg class="cursor3d" viewBox="0 0 80 80" aria-hidden="true"><defs><filter id="cur-shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="3" dy="6" stdDeviation="3.5" flood-color="#18202E" flood-opacity=".35"/></filter><linearGradient id="cur-fill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a4252"/><stop offset="1" stop-color="#0d121b"/></linearGradient></defs><path filter="url(#cur-shadow)" d="M14 8 L14 62 L28 49 L38 70 L48 65 L38 45 L57 45 Z" fill="url(#cur-fill)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg>',
+}
+
+
 def contact(prefix=''):
     return f'''<section class="contact" id="contact" aria-labelledby="contact-title"><div class="wrap contact-inner">
-<h2 id="contact-title">Let’s talk</h2>
-<p class="contact-lead">Email is the fastest way to reach me.</p>
-<a class="contact-mail" href="mailto:{e(C['email'])}">{e(C['email']).replace('@', '<wbr>@')}</a>
-<div class="contact-actions"><button class="btn btn-light" type="button" data-copy-email="{e(C['email'])}">Copy email</button><a class="btn btn-ghost-light" href="{prefix}{e(C['cv_pdf'])}" download>Download CV (PDF)</a>{ext(C['linkedin'], 'LinkedIn', 'text-link-light')}{ext(C['github'], 'GitHub', 'text-link-light')}</div>
+<h2 id="contact-title" class="contact-title"><span class="ct-line">Interested in {ICONS['peace']}</span><span class="ct-line">building together?</span></h2>
+<p class="contact-lead">Contact me:</p>
+<p class="contact-mail-row"><a class="contact-mail" href="mailto:{e(C['email'])}">{e(C['email']).replace('@', '<wbr>@')}</a>{ICONS['cursor']}</p>
+<div class="contact-actions"><button class="btn btn-dark" type="button" data-copy-email="{e(C['email'])}">Copy email</button><a class="btn btn-outline" href="{prefix}{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
 <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
 </div></section>'''
 
 
 def footer(prefix=''):
-    return f'''<footer class="site-footer"><div class="wrap footer-inner"><p>© <span data-year>{date.today().year}</span> {e(C['name'])}</p><p>{e(C['location'])}</p>{ext(C['github'] + '/TitovMykhailo.github.io', 'Site source')}<a href="#top">Back to top</a></div></footer>
+    return f'''<footer class="site-footer"><div class="wrap footer-inner">
+<p class="footer-made">Designed &amp; built<br>by {e(C['name'])}</p>
+<p class="footer-pills">{ext(C['linkedin'], 'LinkedIn', 'pill-link')}{ext(C['github'], 'GitHub', 'pill-link')}{ext(C['github'] + '/TitovMykhailo.github.io', 'Site source', 'pill-link')}</p>
+<p class="footer-end">© <span data-year>{date.today().year}</span> {e(C['name'])}<br><a href="#top">Back to top ↑</a></p>
+</div></footer>
 </body></html>'''
 
 
@@ -204,13 +220,72 @@ def media(p, prefix='', large=False, eager=False):
 
 # ---------------------------------------------------------------- home page parts
 
-def stack():
-    bands = ''
-    for layer in C['layers']:
-        links = ''.join(f'<li><a href="projects/{p}.html">{e(P[p]["title"])}</a></li>' for p in layer['projects'])
-        bands += f'''<li class="band tint-{e(layer['color'])}"><div class="band-head"><h3>{e(layer['name'])}</h3><p>{e(layer['note'])}</p></div><ul class="band-projects">{links}</ul></li>'''
-    return f'''<figure class="stack" aria-labelledby="stack-caption"><ol class="bands">{bands}</ol>
-<figcaption id="stack-caption">Every project, by the layer of the system it works at.</figcaption></figure>'''
+# ---------------------------------------------------------------- playful hero + intro
+
+def hero_dots():
+    import random
+    rnd = random.Random(7)
+    dots = ''.join(f'<circle cx="{rnd.uniform(0, 1600):.0f}" cy="{rnd.uniform(0, 760):.0f}" r="{rnd.choice((1.6, 2, 2.4, 3))}"/>' for _ in range(150))
+    return f'<svg class="hero-dots" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-hidden="true">{dots}</svg>'
+
+
+def mesh_card():
+    nodes = [(36, 80), (96, 30), (152, 86), (214, 34), (266, 88)]
+    edges = [(0, 1), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (0, 2)]
+    lines = ''.join(f'<line x1="{nodes[a][0]}" y1="{nodes[a][1]}" x2="{nodes[b][0]}" y2="{nodes[b][1]}"/>' for a, b in edges)
+    circles = ''.join(f'<circle class="mc-node" style="--d:{i * .45}s" cx="{x}" cy="{y}" r="9"/>' for i, (x, y) in enumerate(nodes))
+    path1 = 'M36 80 L96 30 L214 34 L266 88'
+    path2 = 'M266 88 L152 86 L36 80'
+    return f'''<svg class="mesh-card" viewBox="0 0 300 118" aria-hidden="true">
+<g class="mc-edges">{lines}</g>{circles}
+<circle class="mc-packet" r="5"><animateMotion dur="3.2s" repeatCount="indefinite" path="{path1}"/></circle>
+<circle class="mc-packet mc-packet-2" r="4"><animateMotion dur="2.6s" begin="1s" repeatCount="indefinite" path="{path2}"/></circle></svg>'''
+
+
+def hero_type():
+    capsule_bands = ''.join(f'<i class="tint-{e(l["color"])}"></i>' for l in C['layers'])
+    tagline = C.get('hero_tagline', {})
+    return f'''<section class="hero" aria-labelledby="hero-title">
+{hero_dots()}
+<div class="wrap hero-stage">
+<h1 id="hero-title" class="sr-only">{e(C['name'])}, {e(C['hero_words'][0].lower())} {e(C['hero_words'][1].lower())} {e(C['hero_words'][2].lower())}</h1>
+<div class="hero-type" aria-hidden="true">
+<span class="ht-line ht-dots">{e(C['hero_words'][0])}</span>
+<span class="ht-line ht-orange">S<button class="ht-toggle" type="button" tabindex="-1" aria-pressed="false" data-toggle><span class="ht-knob"></span></button>FTWARE</span>
+<span class="ht-line ht-black">ENG<span class="ht-capsule">{capsule_bands}<b></b></span>NEER<span class="ht-sticker"><span>&lt;/&gt;</span></span></span>
+<figure class="hero-card"><div class="hero-card-art">{mesh_card()}</div><figcaption lang="{e(tagline.get('lang', 'uk'))}">{e(tagline.get('before', ''))} <em>{e(tagline.get('accent', ''))}</em> {e(tagline.get('text', ''))}</figcaption></figure>
+</div>
+</div>
+<div class="wrap hero-foot">
+<p class="hero-places-label"><span class="status-dot" aria-hidden="true"></span>{e(C['status'])}. Studying and building at</p>
+<div class="marquee" aria-label="Places">{names_track()}{names_track(hidden=True)}</div>
+<div class="hero-actions"><a class="btn btn-signal" href="#work">See the projects</a><a class="btn btn-outline" href="{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
+</div>
+</section>'''
+
+
+def names_track(hidden=False):
+    items = ''.join(f'<li class="nm-{e(n["style"])}">{e(n["name"])}</li>' for n in C['places'])
+    attr = ' aria-hidden="true"' if hidden else ''
+    return f'<ul class="marquee-track"{attr}>{items}</ul>'
+
+
+def intro():
+    i = C['intro']
+    avatar = (f'<img class="intro-avatar" src="{e(C["photo"])}" alt="" width="96" height="96">' if C.get('photo')
+              else f'<span class="intro-avatar intro-avatar-mono" aria-hidden="true">{e(C["initials"])}</span>')
+    text = (f'Hi, I’m {avatar} {e(C["short_name"])}{ICONS["peace"]}, an ICT student at <span class="intro-pill">{e(i["pill"])}</span> '
+            f'building software from bits{ICONS["chip"]}, networks{ICONS["mesh"]} and APIs{ICONS["braces"]} to AI agents{ICONS["spark"]}.')
+    skills = ''
+    for sk in i['skills']:
+        style = f' style="--r:{sk["rotate"]}deg"' if sk.get('rotate') else ''
+        skills += f'<li class="sk sk-{e(sk["style"])}"{style}>{e(sk["name"])}</li>'
+    return f'''<section class="intro" id="about-intro" aria-label="Introduction"><div class="wrap intro-inner">
+<p class="intro-text">{text}</p>
+<svg class="scroll-badge" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="badge-circle" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0"/></defs><text><textPath href="#badge-circle">SCROLL ✦ SCROLL ✦ SCROLL ✦ </textPath></text></svg>
+<p class="skills-label">with my skills in:</p>
+<ul class="skill-cloud">{skills}</ul>
+</div></section>'''
 
 
 def metrics(p, cls='metrics'):
@@ -328,18 +403,8 @@ def build_index():
     out = head(f"{C['name']} — {C['role']}", C['meta_description'], extra=json_ld())
     out += header()
     out += f'''<main id="main">
-<section class="hero" aria-labelledby="hero-title"><div class="wrap">
-<p class="status"><span class="status-dot" aria-hidden="true"></span>{e(C['status'])} in {e(C['location'].split(',')[0])}</p>
-<h1 id="hero-title" class="display">{e(C['name'])}</h1>
-<div class="hero-grid">
-<div class="hero-copy">
-<p class="hero-role">{e(C['role'])}</p>
-<p class="hero-lead">{e(C['lead'])}</p>
-<div class="hero-actions"><a class="btn btn-signal" href="#work">See the projects</a><a class="btn btn-outline" href="{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
-<p class="hero-links">{ext(C['github'], 'GitHub', 'text-link')}{ext(C['linkedin'], 'LinkedIn', 'text-link')}<a class="text-link" href="mailto:{e(C['email'])}">Email</a></p>
-</div>
-{stack()}
-</div></div></section>
+{hero_type()}
+{intro()}
 <section class="section work" id="work" aria-labelledby="work-title"><div class="wrap">
 <h2 id="work-title">Selected work</h2><p class="section-lead">Four projects in depth. Screens and numbers come from the code itself.</p>
 <div class="cases">{''.join(case_card(p, i) for i, p in enumerate(FEATURED))}</div>

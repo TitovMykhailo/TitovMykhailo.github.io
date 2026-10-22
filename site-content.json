@@ -928,5 +928,93 @@
         "Git"
       ]
     }
+  },
+  "hero_words": [
+    "Curious",
+    "Software",
+    "Engineer"
+  ],
+  "hero_tagline": {
+    "lang": "uk",
+    "before": "Український",
+    "accent": "SOFTWARE ENGINEER,",
+    "text": "що будує речі від бітів до штучного інтелекту."
+  },
+  "places": [
+    {
+      "name": "STU FEI",
+      "style": "wide"
+    },
+    {
+      "name": "Dnipro University of Technology",
+      "style": "serif"
+    },
+    {
+      "name": "RAKATHON 2026",
+      "style": "condensed"
+    },
+    {
+      "name": "Huawei Seeds for the Future",
+      "style": "plain"
+    },
+    {
+      "name": "STU Ideathon",
+      "style": "dots"
+    }
+  ],
+  "intro": {
+    "pill": "STU FEI",
+    "skills": [
+      {
+        "name": "Curiosity",
+        "style": "outline",
+        "rotate": -22
+      },
+      {
+        "name": "Spring Boot",
+        "style": "filled"
+      },
+      {
+        "name": "Python",
+        "style": "outline"
+      },
+      {
+        "name": "IPv6 mesh",
+        "style": "dots"
+      },
+      {
+        "name": "Java",
+        "style": "condensed"
+      },
+      {
+        "name": "Teamwork",
+        "style": "outline",
+        "rotate": 18
+      },
+      {
+        "name": "Verilog",
+        "style": "circle"
+      },
+      {
+        "name": "LLM agents",
+        "style": "serif"
+      },
+      {
+        "name": "React + TypeScript",
+        "style": "filled"
+      },
+      {
+        "name": "PostgreSQL",
+        "style": "outline"
+      },
+      {
+        "name": "Docker",
+        "style": "mono"
+      },
+      {
+        "name": "&",
+        "style": "amp"
+      }
+    ]
   }
 }
