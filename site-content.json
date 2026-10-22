@@ -1,280 +1,793 @@
 {
   "name": "Mykhailo Titov",
+  "short_name": "Mykhailo",
+  "initials": "MT",
+  "role": "Software engineer & ICT student",
+  "location": "Bratislava, Slovakia",
+  "status": "Open to internships",
+  "site_url": "https://titovmykhailo.me",
   "email": "titov.mykhailo.work@gmail.com",
   "github": "https://github.com/TitovMykhailo",
   "linkedin": "https://www.linkedin.com/in/titovmykhailo",
-  "projects": [
+  "photo": null,
+  "cv_pdf": "assets/Mykhailo_Titov_CV.pdf",
+  "lead": "I build across the stack — from a Verilog error-correcting decoder and a mesh-routing protocol to Spring Boot APIs and Python agents on top of LLMs.",
+  "meta_description": "Mykhailo Titov — software engineer and ICT student in Bratislava. Case studies in Java/Spring Boot, React, network protocols, Verilog and AI automation.",
+  "about": {
+    "bio": [
+      "I study Information and Communication Technologies at STU FEI in Bratislava and Computer Science in parallel at Dnipro University of Technology.",
+      "I like knowing what happens underneath an interface, so my projects go deep in different directions: a mesh-routing protocol with 167 passing tests, a Verilog decoder, Java backends with JWT and WebSockets, and Python agents built on LLM APIs.",
+      "Right now I’m building Python agents on top of GPT and Claude APIs, tools for evaluating LLM output, and n8n automation pipelines. I also team up at hackathons: RAKATHON 2026, Huawei Seeds for the Future and the STU Ideathon, where my team placed 3rd."
+    ],
+    "looking_for": "Internships and junior roles in backend or AI-automation engineering.",
+    "languages": []
+  },
+  "education": [
     {
-      "id": "kizuna",
+      "school": "Slovak University of Technology (STU FEI)",
+      "program": "Information and Communication Technologies, Bachelor’s",
+      "place": "Bratislava",
+      "years": null
+    },
+    {
+      "school": "Dnipro University of Technology",
+      "program": "Computer Science, parallel Bachelor’s",
+      "place": "Dnipro",
+      "years": null
+    }
+  ],
+  "timeline": [
+    {
+      "year": "2026",
+      "title": "Video Editing Automation",
+      "text": "Claude Code skill that assembles a DaVinci Resolve edit from a voiceover.",
+      "project": "video-editor"
+    },
+    {
+      "year": "2026",
+      "title": "Job Hunter Agent",
+      "text": "Python agent that scores job listings with Azure OpenAI.",
+      "project": "job-hunter"
+    },
+    {
+      "year": "2026",
       "title": "KIZUNA v2",
-      "subtitle": "Keeping a network connected when the links don’t cooperate.",
-      "category": "networks",
-      "label": "NETWORK PROTOCOL / PYTHON",
-      "color": "mint",
-      "visual": "network",
-      "featured": true,
-      "repo": "https://github.com/TitovMykhailo/Kizuna-v2",
-      "source": "kizuna/README.md",
-      "stack": [
-        "Python",
-        "UDP / IPv6",
-        "Docker",
-        "Web simulator"
-      ],
-      "summary": "An adaptive mesh-routing protocol with neighbor discovery, link evaluation, primary and backup paths, and a reproducible simulation environment.",
-      "problem": "Unstable links and disappearing nodes make routing difficult. This project explores how autonomous devices can discover neighbors, share topology and adapt their forwarding decisions when conditions change.",
-      "implementation": [
-        "Protocol messages for discovery, topology sharing, routed data and emergency delivery.",
-        "Gradual neighbor admission and link-state routing with primary and backup paths.",
-        "Resilience modes and relay adaptation as links or nodes degrade.",
-        "A Docker validation environment and web simulator to make protocol behavior visible."
-      ],
-      "architecture": [
-        "Discover neighbors",
-        "Evaluate links",
-        "Compute paths",
-        "Adapt forwarding"
-      ],
-      "status": "Public protocol implementation with a simulation and validation setup. The web illustration on this portfolio is conceptual; it is not a live measurement of the protocol.",
-      "learning": "Protocol design connects algorithms with distributed behavior. The repository separates the protocol core, reproducible experiments and visual explanation so each layer can be studied independently."
+      "text": "Adaptive IPv6 mesh-routing protocol, 39 commits over April.",
+      "project": "kizuna"
     },
     {
-      "id": "secded",
-      "title": "Hybrid SEC-DED Decoder",
-      "subtitle": "A little redundancy. A more resilient signal.",
-      "category": "hardware",
-      "label": "VERILOG / ERROR CORRECTION",
-      "color": "lilac",
-      "visual": "bits",
-      "featured": true,
-      "repo": null,
-      "source": "Project details supplied directly by Mykhailo; source not linked publicly.",
-      "stack": [
-        "Verilog",
-        "Hamming (8,4)",
-        "Testbenches",
-        "BPSK + AWGN"
-      ],
-      "summary": "Extended Hamming (8,4) encoding and decoding, reliability-based correction logic, and a simulation setup comparing hard and hybrid decoding.",
-      "problem": "A communication channel can change a transmitted bit. This research connects the theory of error-correcting codes with an HDL implementation and an evaluation setup for comparing decoding approaches.",
-      "implementation": [
-        "An extended Hamming (8,4) SEC-DED encoder and decoder in Verilog.",
-        "A custom bit layout linking syndrome values to bit positions.",
-        "Reliability checks and hybrid correction logic.",
-        "A BPSK + AWGN simulation setup for studying BER across an Eb/N0 sweep."
-      ],
-      "architecture": [
-        "Encode data",
-        "Model the channel",
-        "Decode",
-        "Compare errors"
-      ],
-      "status": "Research in progress. The source has not been linked publicly, and measured BER results are not published on this page. The bit graphic is an explanatory illustration, not a benchmark.",
-      "learning": "The emphasis is on understanding where the decoder succeeds, where it fails and how to demonstrate correctness through testbenches and controlled experiments."
+      "year": "2026",
+      "title": "RAKATHON 2026, Brno",
+      "text": "Team prototype that fills REDCap documentation and flags errors in a urologist’s records.",
+      "project": "prostapaper"
     },
+    {
+      "year": "2025–26",
+      "title": "Study Group, Task Tracker, Appointment System",
+      "text": "Three full-stack Spring Boot + React applications.",
+      "project": "task-tracker"
+    }
+  ],
+  "layers": [
+    {
+      "id": "apps",
+      "name": "Applications & AI",
+      "note": "Python pipelines that put LLMs to work",
+      "color": "sky",
+      "projects": [
+        "job-hunter",
+        "video-editor",
+        "prostapaper"
+      ]
+    },
+    {
+      "id": "backend",
+      "name": "Backend & web",
+      "note": "Java, Spring Boot and React apps",
+      "color": "peach",
+      "projects": [
+        "task-tracker",
+        "clinic",
+        "study-group"
+      ]
+    },
+    {
+      "id": "network",
+      "name": "Networks",
+      "note": "Protocols over UDP and IPv6",
+      "color": "mint",
+      "projects": [
+        "kizuna"
+      ]
+    },
+    {
+      "id": "hardware",
+      "name": "Hardware & signals",
+      "note": "Verilog and error-correcting codes",
+      "color": "lilac",
+      "projects": [
+        "secded"
+      ]
+    }
+  ],
+  "toolbox": [
+    {
+      "group": "Backend",
+      "items": [
+        "Java 17/21",
+        "Spring Boot 3",
+        "Spring Security + JWT",
+        "REST & OpenAPI",
+        "SQL",
+        "PostgreSQL",
+        "H2",
+        "Flyway"
+      ],
+      "used_in": [
+        "task-tracker",
+        "clinic",
+        "study-group"
+      ]
+    },
+    {
+      "group": "Frontend",
+      "items": [
+        "React",
+        "TypeScript",
+        "Vite",
+        "Recharts",
+        "WebSocket / STOMP"
+      ],
+      "used_in": [
+        "task-tracker",
+        "clinic",
+        "study-group"
+      ]
+    },
+    {
+      "group": "AI & automation",
+      "items": [
+        "Python",
+        "Azure OpenAI",
+        "Claude API",
+        "Prompt design",
+        "LLM output evaluation",
+        "n8n",
+        "Google Sheets API"
+      ],
+      "used_in": [
+        "job-hunter",
+        "video-editor",
+        "prostapaper"
+      ]
+    },
+    {
+      "group": "Networks",
+      "items": [
+        "IPv6",
+        "UDP",
+        "Link-state routing",
+        "Docker Compose labs",
+        "tc netem fault injection",
+        "pytest"
+      ],
+      "used_in": [
+        "kizuna"
+      ]
+    },
+    {
+      "group": "Hardware & signals",
+      "items": [
+        "Verilog",
+        "Testbenches",
+        "Hamming codes",
+        "BPSK + AWGN modelling",
+        "MATLAB"
+      ],
+      "used_in": [
+        "secded"
+      ]
+    },
+    {
+      "group": "Workflow",
+      "items": [
+        "Git & GitHub",
+        "Linux",
+        "Docker",
+        "Google Cloud Run",
+        "Technical documentation"
+      ],
+      "used_in": []
+    }
+  ],
+  "featured_order": [
+    "task-tracker",
+    "kizuna",
+    "clinic",
+    "prostapaper"
+  ],
+  "projects": [
     {
       "id": "task-tracker",
       "title": "Task Tracker",
-      "subtitle": "A workspace for the work behind the work.",
-      "category": "software",
-      "label": "FULL-STACK / JAVA + REACT",
+      "layer": "backend",
       "color": "peach",
-      "visual": "tasks",
-      "featured": true,
+      "year": "2026",
+      "outcome": "A project workspace with 35 REST endpoints and a drag-and-drop widget dashboard",
+      "subtitle": "Projects, tasks, time tracking and analytics in one workspace.",
+      "summary": "A full-stack workspace for projects, tasks, time tracking, analytics and customizable widgets, with a Spring Boot backend and a React frontend.",
+      "role": null,
+      "team": null,
       "repo": "https://github.com/TitovMykhailo/Task-Tracker",
-      "source": "README.md and frontend/package.json",
+      "demo": null,
       "stack": [
-        "Java / Spring Boot",
-        "React",
+        "Java 21",
+        "Spring Boot 3",
+        "Spring Security + JWT",
         "PostgreSQL",
-        "Docker"
-      ],
-      "summary": "A full-stack workspace for projects, tasks, time tracking, analytics and customizable widgets, with a Java backend and React frontend.",
-      "problem": "Tasks, time entries and project progress are easier to understand when they share one workspace. This application brings those workflows together behind a REST API.",
-      "implementation": [
-        "JWT authentication and CRUD APIs for projects, tasks, reminders and widgets.",
-        "A React interface with a dashboard, calendar, analytics and project boards.",
-        "Active time-tracking sessions and project-progress views.",
-        "A drag-and-resize widget grid, draft/publish workflow and Docker Compose setup."
-      ],
-      "architecture": [
-        "React interface",
-        "REST + JWT",
-        "Spring services",
-        "PostgreSQL"
-      ],
-      "status": "Public source project. The repository documents backend integration tests and local startup instructions. The Generate with AI feature is a UI-only, rule-based mock; stored Java logic is not executed on the server.",
-      "learning": "A full-stack project brings together data modeling, authentication, API boundaries and interface state. This project also explores extensibility through configurable widgets."
-    },
-    {
-      "id": "prostapaper",
-      "title": "ProstaPaper",
-      "subtitle": "From pathology documents to a reviewable record.",
-      "category": "software",
-      "label": "TEAM PROJECT / RAKATHON 2026",
-      "color": "blue",
-      "visual": "document",
-      "featured": true,
-      "repo": null,
-      "source": "Team project details supplied directly by Mykhailo.",
-      "stack": [
-        "Document processing",
-        "Human review",
-        "REDCap workflow",
-        "On-premises design"
-      ],
-      "summary": "A team hackathon prototype that proposes structured values from pathology documents and diagrams for a clinician to review before registry export.",
-      "problem": "Information in pathology reports and tumour diagrams needs to be converted into consistent registry fields. The challenge is to help a clinician review proposed values alongside the original documents.",
-      "implementation": [
-        "A document-to-structured-record workflow for the Masaryk Memorial Cancer Institute challenge.",
-        "Source documents displayed alongside proposed extracted values.",
-        "A review step for corrections and conflicting information before confirmation.",
-        "A production architecture intended for hospital-controlled servers and local processing."
-      ],
-      "architecture": [
-        "Input documents",
-        "Extract proposals",
-        "Clinician review",
-        "Registry export"
-      ],
-      "status": "Team hackathon prototype from RAKATHON in Brno. Individual contribution details are not yet documented here. Production deployment and live registry integration are separate validation steps. No patient data is displayed on this portfolio.",
-      "learning": "In document workflows, useful automation needs a clear review surface and a visible path back to the source. The interface illustration here uses generic placeholder fields."
-    },
-    {
-      "id": "study-group",
-      "title": "Study Group",
-      "subtitle": "A shared place to learn and get things done.",
-      "category": "software",
-      "label": "COLLABORATION / JAVA + REACT",
-      "color": "yellow",
-      "visual": "study",
-      "featured": false,
-      "repo": "https://github.com/TitovMykhailo/App",
-      "source": "README.md",
-      "stack": [
-        "Spring Boot",
+        "Flyway",
         "React",
-        "WebSocket",
-        "PostgreSQL / GCP"
+        "Recharts",
+        "Docker Compose"
       ],
-      "summary": "A study-group web app with chat, shared tasks, file resources, member roles and realtime notifications.",
-      "problem": "Study groups need a way to keep discussion, tasks and learning resources connected. The application combines them in one shared group workspace.",
+      "metrics": [
+        {
+          "value": "35",
+          "label": "REST endpoints"
+        },
+        {
+          "value": "7",
+          "label": "app screens"
+        },
+        {
+          "value": "3",
+          "label": "integration test suites"
+        }
+      ],
+      "media": {
+        "kind": "image",
+        "src": "assets/projects/task-tracker/overview.webp",
+        "width": 1600,
+        "height": 1000,
+        "alt": "Task Tracker overview: a widget dashboard with a focus timer, upcoming reminders, a focus-trend chart, project progress and a tasks-by-status chart."
+      },
+      "gallery": [
+        {
+          "src": "assets/projects/task-tracker/analytics.webp",
+          "width": 1600,
+          "height": 1000,
+          "alt": "Analytics page with completed tasks and focus hours over a week, a tasks-by-status donut and a project-progress bar chart.",
+          "caption": "Analytics: completed tasks vs. focus hours, status breakdown and project progress."
+        },
+        {
+          "src": "assets/projects/task-tracker/project.webp",
+          "width": 1600,
+          "height": 1000,
+          "alt": "Project details page listing tasks with status, priority, due date and tag columns and filters.",
+          "caption": "Project details: filterable task list with inline status changes."
+        }
+      ],
+      "media_note": "Screenshots of the real React frontend running locally with the project’s demo account; API responses were filled with seed-style demo data for the capture.",
+      "problem": "Tasks, time entries and project progress are easier to understand when they live in one place. The goal was a single workspace where planning, focus time and progress feed the same dashboard.",
       "implementation": [
-        "Group and member management with roles.",
-        "Task CRUD, deadlines and links to shared resources.",
-        "Realtime chat, typing events and online status over WebSocket.",
-        "JWT and Google OAuth2, plus documented Google Cloud deployment configuration."
+        "JWT authentication plus CRUD APIs for projects, tasks, reminders and widgets — 35 endpoints documented with OpenAPI/Swagger.",
+        "Seven React screens: overview, projects with task board, calendar, analytics, time tracker, widget studio and settings.",
+        "Time tracking with an active-session model, and analytics endpoints for KPIs, productivity, status breakdown and project progress.",
+        "A drag-and-resize widget grid with a template marketplace and a draft → validate → publish flow.",
+        "Flyway migrations, H2 for local runs, PostgreSQL in Docker Compose, and integration tests for auth, projects and tasks."
       ],
       "architecture": [
-        "React workspace",
-        "REST / WebSocket",
-        "Spring Boot",
-        "PostgreSQL + GCS"
+        "React + Vite interface",
+        "REST API with JWT",
+        "Spring services",
+        "PostgreSQL via Flyway"
       ],
-      "status": "Public source project with startup and deployment instructions. This portfolio links to the code; it does not claim that a production deployment is currently online.",
-      "learning": "This project combines synchronous API requests with realtime events and connects authorization, file storage and collaborative interface state."
+      "facts": [],
+      "results": "A complete, runnable application: one `docker compose up` starts PostgreSQL, the backend and the frontend. Stored “Java logic” in widgets is validated but never executed on the server, and “Generate with AI” is a rule-based UI mock.",
+      "learning": "Designing the widget system taught me to keep extensibility safe: user-defined content is stored and validated, but the server never runs it."
     },
     {
-      "id": "job-hunter",
-      "title": "Job Hunter Agent",
-      "subtitle": "Turning a noisy job feed into a useful shortlist.",
-      "category": "ai",
-      "label": "AI AUTOMATION / PYTHON",
+      "id": "kizuna",
+      "title": "KIZUNA v2",
+      "layer": "network",
       "color": "mint",
-      "visual": "agent",
-      "featured": false,
-      "repo": "https://github.com/TitovMykhailo/Agent_W",
-      "source": "README.md and main.py",
+      "year": "2026",
+      "outcome": "A self-healing IPv6 mesh-routing protocol, validated on a 12-node Docker lab",
+      "subtitle": "Keeps a mesh network routing when links and nodes fail.",
+      "summary": "An adaptive mesh-routing protocol for unstable autonomous devices: neighbor discovery, link evaluation, gradual neighbor admission, primary and backup paths, and resilience modes — with a Docker lab and a web simulator to make it visible.",
+      "role": null,
+      "team": null,
+      "repo": "https://github.com/TitovMykhailo/Kizuna-v2",
+      "demo": null,
       "stack": [
         "Python",
-        "Azure OpenAI",
-        "Google Sheets",
-        "Filtering"
+        "asyncio",
+        "UDP / IPv6 multicast",
+        "Pydantic",
+        "FastAPI",
+        "Docker Compose",
+        "tc netem",
+        "pytest"
       ],
-      "summary": "A Python pipeline that collects job listings, filters low-signal posts, scores relevance with Azure OpenAI and logs results to Google Sheets.",
-      "problem": "A job feed can contain duplicate listings, unsuitable seniority levels and unrelated posts. The pipeline applies filtering before AI-based scoring to produce a more relevant list.",
+      "metrics": [
+        {
+          "value": "167",
+          "label": "automated tests passing"
+        },
+        {
+          "value": "12",
+          "label": "nodes in the Docker lab"
+        },
+        {
+          "value": "≈10.5k",
+          "label": "lines of Python"
+        }
+      ],
+      "media": {
+        "kind": "diagram",
+        "diagram": "kizuna-map",
+        "alt": "Map of the default KIZUNA field scenario: two gateways in opposite corners, seven routers, two modules and two standby routers spread over a 1600 by 900 metre area."
+      },
+      "gallery": [],
+      "media_note": "Node positions and roles are taken from the repository’s simulator/scenario.json. Test count from running pytest on the public repository in October 2026.",
+      "problem": "When links are unstable and nodes disappear, a static route stops working. KIZUNA explores how autonomous devices can discover each other, decide which links to trust, share topology and keep traffic moving as conditions degrade.",
       "implementation": [
-        "Collection adapters for multiple job sources.",
-        "Prefiltering for low-signal and seniority-mismatched posts.",
-        "Azure OpenAI relevance scoring on a 0–10 scale.",
-        "Deduplication through a processed-job log and separate Google Sheets views."
+        "A binary packet envelope (magic “KIZU”) and six core messages: HELLO, LSA, DATA, SOS, LAYER and PREDICT, sent over UDP/IPv6 multicast.",
+        "Gradual neighbor admission with repeated proof of identity, so the mesh doesn’t instantly trust every device it hears.",
+        "A link-state database and routing engine that keep a primary and a backup path, plus a relay advisor that prefers capable, under-used nodes.",
+        "Four resilience layers (normal, degraded, emergency, survival) and four traffic classes, so control and SOS traffic survive while bulk traffic is shed first.",
+        "A 12-container Docker lab with reproducible fault injection (tc netem, container stop/start), gateway failover, and a web dashboard of nodes, links and paths."
       ],
       "architecture": [
-        "Collect listings",
-        "Filter duplicates",
-        "Score relevance",
-        "Log to Sheets"
+        "Discover neighbors",
+        "Evaluate and admit links",
+        "Flood topology (LSA)",
+        "Compute primary + backup paths",
+        "Adapt forwarding by layer"
       ],
-      "status": "Public Python source project. Live operation depends on configured API access and source availability. Gmail reply checking is documented as disabled; no autonomous application submission is claimed here.",
-      "learning": "A useful AI workflow needs deterministic filtering and traceable outputs around the model. The repository separates collection, scoring and logging into distinct modules."
+      "facts": [
+        {
+          "label": "Packet header",
+          "code": "struct \"!4sBBIdHI\"\nmagic       4s   \"KIZU\"\nversion     B\nmsg_type    B\nsequence    I\ntimestamp   d\nnode_id_len H\npayload_len I"
+        },
+        {
+          "label": "Resilience layers",
+          "items": [
+            "NORMAL",
+            "DEGRADED",
+            "EMERGENCY",
+            "SURVIVAL"
+          ]
+        },
+        {
+          "label": "Traffic classes",
+          "items": [
+            "critical",
+            "control",
+            "normal",
+            "bulk"
+          ]
+        },
+        {
+          "label": "Transport",
+          "items": [
+            "UDP/IPv6",
+            "multicast ff02::5a49",
+            "port 6346"
+          ]
+        }
+      ],
+      "results": "Public repository with the protocol core, a reproducible 12-node lab and a dashboard. The test suite (167 tests) passes on a clean checkout. The roadmap now turns the lab protocol into a real Linux overlay with a `kiz0` TUN interface.",
+      "learning": "Separating the protocol core from the simulator, collector and dashboard made each layer testable on its own — and made it possible to boot the daemon on a real node without the simulator."
     },
     {
       "id": "clinic",
       "title": "Appointment System",
-      "subtitle": "Connecting a booking with the conversation around it.",
-      "category": "software",
-      "label": "CLINIC APP / JAVA + TYPESCRIPT",
-      "color": "blue",
-      "visual": "clinic",
-      "featured": false,
-      "repo": "https://github.com/TitovMykhailo/apointment-system",
-      "source": "README.md and frontend/package.json",
-      "stack": [
-        "Spring Boot",
-        "React / TypeScript",
-        "JWT",
-        "STOMP / WebSocket"
-      ],
+      "layer": "backend",
+      "color": "sky",
+      "year": "2026",
+      "outcome": "A clinic booking system where every appointment opens its own doctor–patient chat",
+      "subtitle": "Role-based clinic bookings with appointment-linked chat.",
       "summary": "A role-based clinic application for patient bookings, doctor schedules, administration and appointment-linked messaging.",
-      "problem": "Booking an appointment involves patients, doctor availability and staff oversight. The project models those roles and connects each appointment to its own chat thread.",
+      "role": null,
+      "team": null,
+      "repo": "https://github.com/TitovMykhailo/apointment-system",
+      "demo": null,
+      "stack": [
+        "Java 17",
+        "Spring Boot 3",
+        "Spring Security + JWT",
+        "STOMP / WebSocket",
+        "H2 / PostgreSQL",
+        "React",
+        "TypeScript"
+      ],
+      "metrics": [
+        {
+          "value": "3",
+          "label": "user roles"
+        },
+        {
+          "value": "29",
+          "label": "REST endpoints"
+        },
+        {
+          "value": "7",
+          "label": "service tests"
+        }
+      ],
+      "media": {
+        "kind": "image",
+        "src": "assets/projects/clinic/chat.webp",
+        "width": 1600,
+        "height": 760,
+        "alt": "Appointment chat: a thread per booking on the left, and a conversation that starts with the doctor's automatic message for the booked time."
+      },
+      "gallery": [
+        {
+          "src": "assets/projects/clinic/dashboard.webp",
+          "width": 1600,
+          "height": 1000,
+          "alt": "Doctor portal dashboard with counters for today, this week, completed appointments and chat threads, a recent-appointments table and quick actions.",
+          "caption": "Doctor portal: daily counters, recent bookings with status, quick actions."
+        }
+      ],
+      "media_note": "Screenshots of the real React + TypeScript frontend running locally as the seeded doctor account; API responses were filled with seed-style demo data for the capture.",
+      "problem": "A booking involves three parties: a patient choosing a time, a doctor with a schedule, and staff who oversee everything. Messages about the visit usually end up in a separate channel, disconnected from the booking itself.",
       "implementation": [
-        "Patient, doctor and admin roles with different pages and permissions.",
-        "Available-slot generation from doctor schedules and booking-conflict checks.",
-        "Appointment-linked chat over STOMP / WebSocket with a REST fallback.",
-        "Spring Security with JWT, Swagger documentation and service test files."
+        "Patient, doctor and admin roles, each with its own pages and permissions enforced by Spring Security and JWT.",
+        "Free slots generated from each doctor’s weekly schedule, with conflict checks before a booking is saved.",
+        "Every booking automatically creates a chat thread and a first message from the doctor’s template ({doctorName}, {date}, {time}…).",
+        "Realtime chat over STOMP / SockJS with a REST fallback, plus Swagger docs and service tests for auth, doctors and appointments."
       ],
       "architecture": [
-        "Patient / doctor UI",
-        "JWT + REST",
-        "Booking service",
-        "Database + chat"
+        "Patient picks doctor and date",
+        "Backend generates free slots",
+        "Conflict check and save",
+        "Chat thread auto-created",
+        "Doctor’s template message sent"
       ],
-      "status": "Public source application with an H2 default database and PostgreSQL-ready configuration. It is presented as a software project, not a deployed clinical service.",
-      "learning": "The project explores role boundaries, schedule data and realtime communication while keeping booking rules on the backend."
+      "facts": [],
+      "results": "Runnable locally with an H2 database and seeded accounts; the configuration is ready for PostgreSQL. It is a software project, not a deployed clinical service.",
+      "learning": "Keeping booking rules on the backend — slot generation, conflict checks, role checks — kept the three interfaces simple and consistent.",
+      "card_media": {
+        "kind": "image",
+        "src": "assets/projects/clinic/dashboard.webp",
+        "width": 1600,
+        "height": 1000,
+        "alt": "Doctor portal dashboard with counters for today, this week, completed appointments and chat threads, a recent-appointments table and quick actions."
+      }
+    },
+    {
+      "id": "prostapaper",
+      "title": "ProstaPaper",
+      "layer": "apps",
+      "color": "lilac",
+      "year": "2026",
+      "outcome": "A RAKATHON prototype that fills a urologist’s REDCap documentation from his records — and flags the errors it finds",
+      "subtitle": "Reads clinical records, fills REDCap and flags inconsistencies.",
+      "summary": "Built by our team at RAKATHON 2026 in Brno, billed as the world’s largest AI hackathon against cancer. A urologist treating prostate cancer needed a tool that reads his records, compares them, fills the hospital’s REDCap documentation — and points out errors and contradictions in the records.",
+      "role": null,
+      "team": "Team project",
+      "repo": null,
+      "demo": null,
+      "stack": [
+        "Document processing",
+        "LLM extraction",
+        "Cross-document checks",
+        "Human-in-the-loop review",
+        "REDCap"
+      ],
+      "metrics": [],
+      "media": {
+        "kind": "diagram",
+        "diagram": "document-review",
+        "alt": "Illustration: a doctor's record on the left with highlighted passages, and the proposed REDCap form on the right, where one field is flagged because two sources disagree."
+      },
+      "gallery": [],
+      "media_note": "Illustration with generic placeholder fields. No patient data is shown anywhere on this site.",
+      "problem": "A urologist treating prostate cancer copies information from his own reports, notes and diagrams into the hospital’s REDCap registry by hand. It takes time, and mistakes in the source records travel straight into the database.",
+      "implementation": [
+        "Reads the doctor’s records — reports, notes and tumour diagrams — and extracts the value each REDCap field needs.",
+        "Compares the documents with each other, so every value is checked against all of its sources.",
+        "Flags errors and contradictions in the records and shows the doctor exactly where they are. This was the key feature.",
+        "Fills the REDCap form as a proposal: nothing is saved until the doctor reviews and confirms it.",
+        "Designed to run on hospital-controlled servers, so documents never leave the institution."
+      ],
+      "architecture": [
+        "Read the records",
+        "Extract and cross-check values",
+        "Flag errors for the doctor",
+        "Doctor reviews and confirms",
+        "Export to REDCap"
+      ],
+      "facts": [
+        {
+          "label": "Event",
+          "items": [
+            "RAKATHON 2026",
+            "Brno, October 2026"
+          ]
+        },
+        {
+          "label": "Key feature",
+          "items": [
+            "Error detection",
+            "flags contradictions for the doctor"
+          ]
+        }
+      ],
+      "results": "Team prototype presented at RAKATHON 2026 in Brno. Using it on real patient records would need clinical validation and an approved hospital deployment.",
+      "learning": "In medical documentation, catching mistakes in the source records matters as much as filling the form — and the doctor has to stay in control of every value."
+    },
+    {
+      "id": "secded",
+      "title": "Hybrid SEC-DED Decoder",
+      "layer": "hardware",
+      "color": "lilac",
+      "year": "2026",
+      "outcome": "An extended Hamming (8,4) decoder in Verilog that corrects single-bit errors and flags double-bit ones",
+      "subtitle": "Error correction in Verilog, from codeword to bit-error rate.",
+      "summary": "Extended Hamming (8,4) encoding and decoding in Verilog, reliability-based hybrid correction logic, and a BPSK + AWGN simulation setup for comparing hard and hybrid decoding.",
+      "role": null,
+      "team": null,
+      "repo": null,
+      "demo": null,
+      "stack": [
+        "Verilog",
+        "Testbenches",
+        "Hamming (8,4)",
+        "BPSK + AWGN",
+        "MATLAB"
+      ],
+      "metrics": [],
+      "media": {
+        "kind": "diagram",
+        "diagram": "codeword",
+        "alt": "Extended Hamming (8,4) codeword with eight bit cells. Bit 5 is flipped; the syndrome 101 points to position 5 and the overall parity check confirms a single, correctable error."
+      },
+      "gallery": [],
+      "media_note": "Textbook illustration of extended Hamming (8,4) — not the project’s measured results.",
+      "problem": "A noisy channel can flip transmitted bits. This research connects the theory of error-correcting codes with a hardware implementation and an experiment that compares decoding strategies.",
+      "implementation": [
+        "An extended Hamming (8,4) SEC-DED encoder and decoder written in Verilog.",
+        "A custom bit layout that maps syndrome values directly to bit positions.",
+        "Reliability checks and hybrid correction logic on top of hard-decision decoding.",
+        "A BPSK + AWGN simulation for measuring bit-error rate across an Eb/N0 sweep."
+      ],
+      "architecture": [
+        "Encode 4 data bits",
+        "Model the noisy channel",
+        "Decode and correct",
+        "Compare error rates"
+      ],
+      "facts": [
+        {
+          "label": "SEC-DED",
+          "items": [
+            "Single error correction",
+            "Double error detection"
+          ]
+        }
+      ],
+      "results": "Research in progress. The source and measured BER curves are not public yet.",
+      "learning": "Testbenches and controlled experiments are how a decoder proves it is correct — and show exactly where it starts to fail."
+    },
+    {
+      "id": "study-group",
+      "title": "Study Group",
+      "layer": "backend",
+      "color": "peach",
+      "year": "2025–26",
+      "outcome": "A study-group app with realtime chat, shared tasks and files, built for Google Cloud",
+      "subtitle": "Chat, tasks and shared files for study groups.",
+      "summary": "A study-group web app with realtime chat, shared tasks, file resources, member roles and notifications, with a documented Google Cloud deployment.",
+      "role": null,
+      "team": null,
+      "repo": "https://github.com/TitovMykhailo/App",
+      "demo": null,
+      "stack": [
+        "Spring Boot",
+        "JWT + Google OAuth2",
+        "WebSocket",
+        "PostgreSQL (Cloud SQL)",
+        "Cloud Storage",
+        "React",
+        "Cloud Run"
+      ],
+      "metrics": [
+        {
+          "value": "34",
+          "label": "REST endpoints"
+        },
+        {
+          "value": "8",
+          "label": "database tables"
+        },
+        {
+          "value": "2",
+          "label": "sign-in methods"
+        }
+      ],
+      "media": {
+        "kind": "diagram",
+        "diagram": "study-arch",
+        "alt": "Architecture: a React single-page app talks to a Spring Boot API over REST and a WebSocket chat channel; the API stores data in Cloud SQL PostgreSQL and files in Cloud Storage, and both run on Cloud Run."
+      },
+      "gallery": [],
+      "media_note": "Architecture drawn from the repository’s README and deployment configuration.",
+      "problem": "Study groups scatter discussion, tasks and materials across different apps. The idea was one group workspace where a chat message can point straight at a task or a file.",
+      "implementation": [
+        "Groups with member roles, task CRUD with deadlines and priorities, and file resources linked to tasks.",
+        "Realtime chat over a plain WebSocket endpoint with typing events, online status and task/resource events.",
+        "Email + password and Google OAuth2 sign-in, both issuing JWTs.",
+        "Deployment configuration for Cloud Build → Cloud Run, Cloud SQL and a Cloud Storage bucket for files."
+      ],
+      "architecture": [
+        "React SPA",
+        "REST + WebSocket",
+        "Spring Boot API",
+        "Cloud SQL + Cloud Storage"
+      ],
+      "facts": [],
+      "results": "Public source with local startup and cloud deployment instructions. This site doesn’t claim a production deployment is currently online.",
+      "learning": "Mixing request/response APIs with realtime events forced clear rules about what the server broadcasts and when the client refetches."
+    },
+    {
+      "id": "job-hunter",
+      "title": "Job Hunter Agent",
+      "layer": "apps",
+      "color": "sky",
+      "year": "2026",
+      "outcome": "An agent that scans five job boards, scores each listing with Azure OpenAI and shortlists the 7+/10 ones",
+      "subtitle": "Turns a noisy job feed into a scored shortlist.",
+      "summary": "A Python pipeline that collects job listings, filters low-signal posts, scores relevance with Azure OpenAI and logs results to Google Sheets.",
+      "role": null,
+      "team": null,
+      "repo": "https://github.com/TitovMykhailo/Agent_W",
+      "demo": null,
+      "stack": [
+        "Python",
+        "Azure OpenAI",
+        "Google Sheets API",
+        "Telegram",
+        "cron"
+      ],
+      "metrics": [
+        {
+          "value": "5",
+          "label": "job sources"
+        },
+        {
+          "value": "0–10",
+          "label": "AI relevance score"
+        },
+        {
+          "value": "≥ 7",
+          "label": "shortlist threshold"
+        }
+      ],
+      "media": {
+        "kind": "diagram",
+        "diagram": "agent-pipeline",
+        "alt": "Pipeline: listings from Profesia.sk, Worki.sk, LinkedIn, Jobs.sk and Reddit are filtered, scored 0 to 10 by Azure OpenAI, and written to a shortlist sheet (score 7 or more) and a full log sheet."
+      },
+      "gallery": [],
+      "media_note": "Pipeline drawn from the repository’s README and source.",
+      "problem": "Job feeds are full of duplicates, “for hire” posts, discussions and senior-only roles. Reading all of it by hand doesn’t scale.",
+      "implementation": [
+        "Collectors for Profesia.sk, Worki.sk, LinkedIn, Jobs.sk and Reddit.",
+        "Deterministic pre-filters for candidate posts, general discussions and strong seniority mismatches — before any model call.",
+        "Azure OpenAI scores each remaining listing from 0 to 10; listings scoring 7 or more go to the shortlist.",
+        "Two Google Sheets views (shortlist and full log), deduplication via a processed-jobs file, and a cron schedule every six hours."
+      ],
+      "architecture": [
+        "Collect listings",
+        "Filter low-signal posts",
+        "Score with Azure OpenAI",
+        "Write to Google Sheets"
+      ],
+      "facts": [],
+      "results": "Public Python project. It runs on a schedule with configured API keys; Gmail reply checking is currently disabled, and it never applies to jobs on its own.",
+      "learning": "Cheap deterministic filters in front of the model cut both cost and noise — the model only judges listings that could plausibly fit."
     },
     {
       "id": "video-editor",
       "title": "Video Editing Automation",
-      "subtitle": "From a voiceover to an editing workflow.",
-      "category": "ai",
-      "label": "CREATIVE TOOLS / PYTHON",
+      "layer": "apps",
       "color": "lilac",
-      "visual": "video",
-      "featured": false,
+      "year": "2026",
+      "outcome": "A Claude Code skill that turns a voiceover into a captioned DaVinci Resolve edit",
+      "subtitle": "From a narration recording to a first cut in DaVinci Resolve.",
+      "summary": "An AI-assisted editing workflow packaged as a Claude Code skill: transcription, silence and filler trimming, captions, clip and sound selection, colour grade and a DaVinci Resolve timeline.",
+      "role": null,
+      "team": null,
       "repo": "https://github.com/TitovMykhailo/video_edeting_skill",
-      "source": "README.md",
+      "demo": null,
       "stack": [
         "Python",
-        "DaVinci Resolve",
-        "Transcription",
-        "Editing pipelines"
+        "Claude Code skills",
+        "DaVinci Resolve scripting",
+        "OpenTimelineIO",
+        "Speech-to-text"
       ],
-      "summary": "A repository containing an AI-assisted editing workflow for transcription, cut planning, captions, media selection and DaVinci Resolve integration.",
-      "problem": "A narrated video requires many coordinated editing steps. This repository organizes them into a configurable pipeline with intermediate files and editing profiles.",
+      "metrics": [
+        {
+          "value": "12",
+          "label": "Python pipeline scripts"
+        },
+        {
+          "value": "2",
+          "label": "editing style profiles"
+        }
+      ],
+      "media": {
+        "kind": "diagram",
+        "diagram": "video-pipeline",
+        "alt": "Pipeline: voiceover, transcribe, trim silence and fillers, captions, match clips and sound, colour grade, DaVinci Resolve timeline, draft render."
+      },
+      "gallery": [],
+      "media_note": "Pipeline drawn from the repository’s scripts and README.",
+      "problem": "Turning a narration into a fast-cut, captioned video takes dozens of small, repetitive editing decisions.",
       "implementation": [
-        "Pipeline stages for transcription, cut planning and synchronized captions.",
-        "Media and audio-library indexing with style-profile configuration.",
-        "DaVinci Resolve integration scripts and an OTIO fallback path.",
-        "Storyboard, timing and timeline-validation references."
+        "Transcription and cut planning that trims silence and filler words without cutting a word in half.",
+        "Synced captions, clip and sound-effect selection from a local media library, with generated frames as a fallback.",
+        "Two style profiles (faceless visual essay, talking-head/screen demo) with overlays for one-off tweaks.",
+        "DaVinci Resolve automation for tracks, captions, grade and render, plus timeline validation and a local dashboard for parallel builds."
       ],
       "architecture": [
         "Voiceover",
-        "Transcript + plan",
-        "Media + captions",
-        "Resolve timeline"
+        "Transcript and cut plan",
+        "Captions, clips and sound",
+        "Resolve timeline and draft render"
       ],
-      "status": "Public repository with configurable editing stages and DaVinci Resolve integration. Full operation depends on local tools, media and configuration; the workflow has not been executed as part of creating this portfolio.",
-      "learning": "Creative automation benefits from visible intermediate stages so an editor can inspect and revise the result instead of treating the pipeline as a black box."
+      "facts": [],
+      "results": "Public repository with an environment checker and setup guide. Full operation needs DaVinci Resolve and a local media library.",
+      "learning": "Visible intermediate files make an automated pipeline editable: you can inspect and fix the plan before anything is rendered."
+    }
+  ],
+  "hackathons": [
+    {
+      "id": "ideathon",
+      "event": "STU Ideathon",
+      "where": "Slovak University of Technology",
+      "year": null,
+      "result": "3rd place",
+      "team": "Randomly formed team",
+      "title": "A digital twin that finds where university heating is wasted",
+      "summary": "Our faculties spend hundreds of thousands of euros a year on heating. We proposed a sensor network that collects data over a measurement period, builds a digital twin of the buildings and uses it to find where heat is lost or spent at the wrong time.",
+      "points": [
+        "Count body heat: each person in a room gives off around 100 W, so a full lecture hall can be pre-heated about 1 °C lower.",
+        "Heat by the timetable: warm a room for the classes actually scheduled in it, not on a fixed clock.",
+        "Shift heating to the night where the building can store it.",
+        "Heat only the rooms in use at a given time, not the whole building."
+      ],
+      "project": null
+    },
+    {
+      "id": "rakathon",
+      "event": "RAKATHON 2026",
+      "where": "Brno, Masaryk Memorial Cancer Institute",
+      "year": "October 2026",
+      "result": null,
+      "team": "Team project",
+      "note": "Billed as the world’s largest AI hackathon against cancer.",
+      "title": "ProstaPaper: REDCap documentation that checks itself",
+      "summary": "A urologist treating prostate cancer needed a tool that reads his records, compares them, fills the hospital’s REDCap documentation — and, most importantly, finds errors in the records and points them out to him.",
+      "points": [],
+      "project": "prostapaper"
+    },
+    {
+      "id": "seeds",
+      "event": "Huawei Seeds for the Future",
+      "where": null,
+      "year": null,
+      "result": null,
+      "team": "Team project",
+      "title": "An AI hub for smart devices",
+      "summary": "A hub that connects many different smart devices, organises the data exchange between them and uses AI to improve how they work together.",
+      "points": [],
+      "project": null
     }
   ]
 }

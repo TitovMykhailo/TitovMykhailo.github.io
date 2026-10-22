@@ -1,134 +1,520 @@
-"""Regenerate the static GitHub Pages site: python3 build.py (standard library only)."""
-from pathlib import Path
+"""Regenerate the static GitHub Pages site from site-content.json.
+
+    python3 build.py
+
+Standard library only. Writes index.html, resume.html, projects/*.html,
+sitemap.xml, robots.txt and TODO_CONTENT.md.
+"""
+from datetime import date
 from html import escape
+from pathlib import Path
 import json
+import re
 
 ROOT = Path(__file__).resolve().parent
-CONTENT = json.loads((ROOT / 'site-content.json').read_text())
-PROJECTS = CONTENT['projects']
+C = json.loads((ROOT / 'site-content.json').read_text(encoding='utf-8'))
+PROJECTS = C['projects']
+P = {p['id']: p for p in PROJECTS}
+LAYERS = {layer['id']: layer for layer in C['layers']}
+FEATURED = [P[i] for i in C['featured_order']]
+SITE = C['site_url'].rstrip('/')
+TODAY = date.today().isoformat()
+
+
+# ---------------------------------------------------------------- helpers
 
 def e(value):
     return escape(str(value), quote=True)
 
-def head(title, description, prefix=''):
+
+def inline(text):
+    """Escape text and turn `code` spans into <code>."""
+    return re.sub(r'`([^`]+)`', r'<code>\1</code>', e(text))
+
+
+def ext(href, label, cls=''):
+    """External link: opens in a new tab and carries the ↗ marker."""
+    c = f' class="{cls}"' if cls else ''
+    return f'<a{c} href="{e(href)}" target="_blank" rel="noopener">{label}<span class="ext" aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>'
+
+
+def reading_time(p):
+    words = ' '.join([p['summary'], p['problem'], ' '.join(p['implementation']), p['results'], p['learning'], p.get('media_note', '')]).split()
+    return max(2, round(len(words) / 160))
+
+
+def layer_of(p):
+    return LAYERS[p['layer']]
+
+
+# ---------------------------------------------------------------- page shell
+
+def head(title, description, prefix='', path='', extra=''):
+    url = f'{SITE}/{path}'
     return f'''<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{e(title)}</title><meta name="description" content="{e(description)}">
-<meta name="theme-color" content="#fffaf1"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}"><meta property="og:type" content="website">
-<link rel="icon" type="image/svg+xml" href="{prefix}favicon.svg"><link rel="stylesheet" href="{prefix}styles.css"><script src="{prefix}script.js" defer></script>
+<title>{e(title)}</title>
+<meta name="description" content="{e(description)}">
+<link rel="canonical" href="{e(url)}">
+<meta name="theme-color" content="#FBF8F3">
+<meta property="og:type" content="website"><meta property="og:url" content="{e(url)}">
+<meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(description)}">
+<meta property="og:image" content="{SITE}/assets/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{e(title)}"><meta name="twitter:description" content="{e(description)}"><meta name="twitter:image" content="{SITE}/assets/og-image.png">
+<link rel="icon" type="image/svg+xml" href="{prefix}favicon.svg"><link rel="apple-touch-icon" href="{prefix}assets/apple-touch-icon.png">
+<link rel="preload" href="{prefix}assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{prefix}styles.css"><script src="{prefix}script.js" defer></script>{extra}
 </head><body><a class="skip" href="#main">Skip to content</a>'''
 
-def header(prefix=''):
-    home = prefix + 'index.html' if prefix else ''
-    return f'''<header class="site-header shell">
-<a class="brand" href="{home or '#top'}" aria-label="Mykhailo Titov home"><span class="brand-mark" aria-hidden="true">✳</span><span>MYKHAILO<br>TITOV</span></a>
-<nav class="site-nav" aria-label="Main navigation"><a href="{home}#work">Work</a><a href="{home}#about">About</a><a href="{home}#contact">Contact</a></nav>
-<a class="header-link" href="{e(CONTENT['github'])}">GitHub ↗</a></header>'''
+
+def header(prefix='', current='', home=None):
+    if home is None:
+        home = f'{prefix}index.html' if prefix else ''
+    def nav(href, label, key):
+        cur = ' aria-current="page"' if key == current else ''
+        return f'<a href="{href}" data-nav="{key}"{cur}>{label}</a>'
+    return f'''<header class="site-header" id="top"><div class="wrap header-inner">
+<a class="brand" href="{prefix or './'}{'index.html' if prefix else ''}"><span class="brand-mark" aria-hidden="true">{e(C['initials'])}</span><span class="brand-name">{e(C['name'])}</span></a>
+<nav class="site-nav" aria-label="Main">{nav(home + '#work', 'Work', 'work')}{nav(home + '#about', 'About', 'about')}{nav(prefix + 'resume.html', 'Resume', 'resume')}{nav(home + '#contact', 'Contact', 'contact')}</nav>
+{ext(C['github'], 'GitHub', 'header-cta')}
+</div></header>'''
+
+
+def contact(prefix=''):
+    return f'''<section class="contact" id="contact" aria-labelledby="contact-title"><div class="wrap contact-inner">
+<h2 id="contact-title">Let’s talk</h2>
+<p class="contact-lead">Email is the fastest way to reach me.</p>
+<a class="contact-mail" href="mailto:{e(C['email'])}">{e(C['email']).replace('@', '<wbr>@')}</a>
+<div class="contact-actions"><button class="btn btn-light" type="button" data-copy-email="{e(C['email'])}">Copy email</button><a class="btn btn-ghost-light" href="{prefix}{e(C['cv_pdf'])}" download>Download CV (PDF)</a>{ext(C['linkedin'], 'LinkedIn', 'text-link-light')}{ext(C['github'], 'GitHub', 'text-link-light')}</div>
+<p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+</div></section>'''
+
 
 def footer(prefix=''):
-    home = prefix + 'index.html' if prefix else ''
-    return f'''<section class="contact-section" id="contact" aria-labelledby="contact-title"><div class="shell">
-<div class="contact-top"><p class="eyebrow">HAVE A PROJECT OR AN INTERESTING PROBLEM?</p><span>BASED IN BRATISLAVA, SK</span></div>
-<h2 class="contact-title" id="contact-title">Let’s make<br><em>something</em> work. ↗</h2>
-<div class="contact-links"><a class="contact-mail" href="mailto:{e(CONTENT['email'])}">{e(CONTENT['email'])} ↗</a><div class="socials"><a href="{e(CONTENT['github'])}">GitHub ↗</a><a href="{e(CONTENT['linkedin'])}">LinkedIn ↗</a></div><button class="copy-email" type="button" data-copy-email="{e(CONTENT['email'])}">Copy email</button></div>
-<p class="contact-copied" id="copy-status" role="status" aria-live="polite"></p></div></section>
-<footer class="footer shell"><p>© <span data-year>2026</span> Mykhailo Titov</p><a href="{e(CONTENT['github'])}/TitovMykhailo.github.io">Site source ↗</a><a class="back-top" href="#top">BACK TO TOP ↑</a></footer>
-<p class="contact-print shell" hidden>Mykhailo Titov · {e(CONTENT['email'])} · github.com/TitovMykhailo</p></body></html>'''
+    return f'''<footer class="site-footer"><div class="wrap footer-inner"><p>© <span data-year>{date.today().year}</span> {e(C['name'])}</p><p>{e(C['location'])}</p>{ext(C['github'] + '/TitovMykhailo.github.io', 'Site source')}<a href="#top">Back to top</a></div></footer>
+</body></html>'''
 
-def toolbar(label):
-    return f'<div class="mock-toolbar"><i></i><i></i><i></i><span>{label}</span></div>'
 
-def graphic(kind):
-    if kind == 'network':
-        nodes = [(64,70,'A'),(305,48,'B'),(417,133,'C'),(336,235,'D'),(103,225,'E')]
-        lines = ''.join(f'<line class="network-edge" x1="240" y1="140" x2="{x}" y2="{y}"/>' for x,y,_ in nodes)
-        points = ''.join(f'<circle class="node" cx="{x}" cy="{y}" r="20"/><circle class="node-core" cx="{x}" cy="{y}" r="4"/><text x="{x-3}" y="{y+38}">{label}</text>' for x,y,label in nodes)
-        return f'''<svg class="network-graphic" viewBox="0 0 480 290" aria-hidden="true"><ellipse cx="240" cy="145" rx="204" ry="109" fill="none" stroke="#a9c9b6" stroke-dasharray="3 7"/>{lines}<path class="network-route" d="M64 70 240 140 336 235 417 133"/><circle class="hub" cx="240" cy="140" r="49"/><text class="hub-text" x="206" y="147">KIZU</text>{points}<text class="link-label" x="104" y="100">DISCOVER</text><text class="link-label" x="285" y="190">ADAPT</text><text x="174" y="278" letter-spacing="2">ROUTE. ADAPT. REPEAT.</text></svg>'''
-    if kind == 'bits':
-        return '''<div class="bits-object" aria-hidden="true"><div class="bits-title"><small>EXTENDED HAMMING (8,4)</small>Make every bit count.</div><div class="bit-row"><span>1</span><span>0</span><span>1</span><span class="error-bit">?</span><span>0</span><span>1</span><span>1</span><span>0</span></div><div class="bits-note">ENCODE → TRANSMIT → CHECK → CORRECT</div></div>'''
-    if kind == 'tasks':
-        return f'''<div class="browser-mock" aria-hidden="true">{toolbar('TASK TRACKER')}<div class="task-layout"><div class="mock-sidebar"><strong>task.</strong><span class="selected">Overview</span><span>Projects</span><span>Calendar</span><span>Analytics</span><span>Time tracker</span></div><div class="mock-main"><p class="mock-overline">YOUR WORKSPACE</p><p class="mock-title">A little more organized.</p><div class="mock-stats"><div class="mock-stat"><b>Build</b><small>PROJECTS</small></div><div class="mock-stat"><b>Plan</b><small>TASKS</small></div><div class="mock-stat"><b>Track</b><small>TIME</small></div></div><div class="mock-board"><div>TO DO<div class="mini-task">Sketch the idea<i></i></div></div><div>IN PROGRESS<div class="mini-task">Make it work<i class="purple"></i></div></div><div>DONE<div class="mini-task">Ship a first step<i class="green"></i></div></div></div></div></div></div>'''
-    if kind == 'document':
-        return '''<div class="document-preview" aria-hidden="true"><div class="paper-sheet"><b>Source document</b><i></i><i></i><i></i><i class="highlight"></i><i></i><i></i><i></i><i class="highlight"></i><i></i><i></i></div><div class="review-sheet"><h4>Review the record.</h4><div class="review-row"><span>Source field</span><span>Review ↗</span></div><div class="review-row"><span>Proposed value</span><span>Check ↗</span></div><div class="review-row"><span>Diagram</span><span>Compare ↗</span></div><div class="review-button">Human review comes first</div></div></div>'''
-    if kind == 'agent':
-        return '''<div class="agent-pipeline" aria-hidden="true"><span>⌕</span><i>→</i><span>AI</span><i>→</i><span>✓</span></div>'''
-    if kind == 'video':
-        return '''<div class="simple-visual-title" aria-hidden="true"><small>VOICE → TIMELINE</small>A workflow<br>with a rhythm.</div><div class="video-timeline" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>'''
-    if kind == 'clinic':
-        return f'''<div class="browser-mock" aria-hidden="true">{toolbar('APPOINTMENT SYSTEM')}<div class="mock-main"><p class="mock-overline">FIND A TIME THAT WORKS</p><p class="mock-title">Your next appointment.</p><div class="clinic-slots"><span>09:00</span><span>09:30</span><span>10:00</span><span>10:30</span><span>11:00</span><span>11:30</span></div><div class="mock-chat-row">Your booking has its own conversation.</div></div></div>'''
-    return f'''<div class="browser-mock" aria-hidden="true">{toolbar('STUDY GROUP')}<div class="mock-main"><p class="mock-overline">A LITTLE LESS SCATTERED</p><p class="mock-title">Learn, together.</p><div class="mock-chat-row">Share a useful resource.</div><div class="mock-chat-row">Plan the next task.</div><div class="mock-chat-row">Keep the conversation going.</div></div></div>'''
+# ---------------------------------------------------------------- diagrams
+# Every diagram is drawn from facts in the project's public repository
+# (or is clearly captioned as a textbook illustration).
 
-def visual(p, large=False):
-    label = 'CONCEPT DIAGRAM' if p['visual'] in ('network','bits','agent','video') else 'INTERFACE ILLUSTRATION'
-    return f'''<div class="project-visual {e(p['color'])}{' case-hero-visual' if large else ''}"><span class="visual-label">{e(p['title'] if p['id'] != 'secded' else 'SEC-DED / VERILOG')}</span>{'' if large else '<span class="preview-arrow" aria-hidden="true">↗</span>'}{graphic(p['visual'])}<span class="visual-footnote">{label}</span></div>'''
+# simulator/scenario.json in TitovMykhailo/Kizuna-v2 (default field scenario)
+KIZUNA_SCENARIO = [
+    ('GW-01', 'gateway', 80, 80, 'r'), ('RTR-02', 'router', 310, 150, 'r'), ('RTR-03', 'router', 620, 160, 'r'),
+    ('MOD-04', 'module', 1350, 220, 'r'), ('RTR-05', 'router', 190, 360, 'r'), ('RTR-06', 'router', 760, 420, 'r'),
+    ('MOD-07', 'module', 1180, 480, 'r'), ('RTR-08', 'router', 130, 690, 'r'), ('RTR-09', 'router', 930, 690, 'r'),
+    ('GW-10', 'gateway', 1520, 820, 'l'), ('RTR-11', 'standby', 740, 380, 'l'), ('RTR-12', 'standby', 810, 460, 'br'),
+]
 
-def card(p, i):
-    return f'''<article class="work-card reveal"><a href="projects/{p['id']}.html" aria-label="Explore {e(p['title'])}">{visual(p)}<div class="project-caption"><div><h3>{e(p['title'])}</h3><p>{e(p['subtitle'])}</p></div><span class="index">0{i}</span></div></a><div class="project-tags">{''.join(f'<span>{e(t)}</span>' for t in p['stack'])}</div></article>'''
 
-def catalog_row(p,i):
-    return f'''<a class="catalog-item" href="projects/{p['id']}.html" data-category="{e(p['category'])}"><span class="catalog-number">0{i}</span><div><h3>{e(p['title'])}</h3><p>{e(p['subtitle'])}</p></div><span class="catalog-stack">{e(' · '.join(p['stack'][:3]))}</span><span class="catalog-arrow" aria-hidden="true">↗</span></a>'''
+def kizuna_map():
+    grid = ''.join(f'<line x1="{x}" y1="0" x2="{x}" y2="900"/>' for x in range(200, 1600, 200))
+    grid += ''.join(f'<line x1="0" y1="{y}" x2="1600" y2="{y}"/>' for y in range(150, 900, 150))
+    nodes = ''
+    for name, kind, x, y, side in KIZUNA_SCENARIO:
+        if kind == 'gateway':
+            shape = f'<circle class="k-ring" cx="{x}" cy="{y}" r="42"/><circle class="k-gw" cx="{x}" cy="{y}" r="26"/>'
+        elif kind == 'module':
+            shape = f'<rect class="k-mod" x="{x - 19}" y="{y - 19}" width="38" height="38" transform="rotate(45 {x} {y})"/>'
+        elif kind == 'standby':
+            shape = f'<circle class="k-standby" cx="{x}" cy="{y}" r="21"/>'
+        else:
+            shape = f'<circle class="k-rtr" cx="{x}" cy="{y}" r="21"/><circle class="k-core" cx="{x}" cy="{y}" r="7"/>'
+        if side == 'l':
+            label = f'<text x="{x - 36}" y="{y + 11}" text-anchor="end">{name}</text>'
+        elif side == 'br':
+            label = f'<text x="{x + 30}" y="{y + 46}">{name}</text>'
+        else:
+            label = f'<text x="{x + (50 if kind == "gateway" else 34)}" y="{y + 11}">{name}</text>'
+        nodes += shape + label
+    svg = f'''<svg class="kizuna-map" viewBox="0 0 1600 900" role="img" aria-labelledby="kmap-t"><title id="kmap-t">Default KIZUNA field scenario: 2 gateways, 7 routers, 2 modules and 2 standby routers over 1600 × 900 m</title>
+<g class="k-grid">{grid}</g><g class="k-nodes">{nodes}</g></svg>'''
+    legend = '<ul class="k-legend"><li><i class="lg-gw"></i>Gateway</li><li><i class="lg-rtr"></i>Router</li><li><i class="lg-mod"></i>Module</li><li><i class="lg-sb"></i>Standby router</li></ul>'
+    return f'<div class="diagram diagram-map">{svg}{legend}</div>'
 
-featured = [p for p in PROJECTS if p['featured']]
-more = [p for p in PROJECTS if not p['featured']]
-home = head('Mykhailo Titov — Software, Networks & Digital Systems', 'A portfolio of software, AI automation, mesh networking and Verilog research by Mykhailo Titov.')
-home += '<div id="top"></div>' + header()
-home += '''<main id="main"><section class="hero shell" aria-labelledby="hero-title"><div class="hero-meta"><p class="eyebrow"><span class="dot"></span>MYKHAILO TITOV / ICT STUDENT</p><p class="eyebrow">BRATISLAVA, SK<br>ALWAYS LEARNING. ALWAYS BUILDING.</p></div><div class="hero-heading"><p class="hero-kicker">Curious by nature.</p><div class="hero-art" aria-hidden="true"><span class="chip">&lt;/&gt;</span><span class="tiny-star">✳</span></div><h1 id="hero-title"><span class="orange">BUILDING</span><br>REAL THINGS.</h1></div><div class="hero-bottom"><p class="hero-description">I’m <strong>Mykhailo</strong>, an ICT student exploring how software, networks and digital systems fit together. I turn ideas into projects I can build, test and keep improving.</p><div class="hero-bottom-right"><p>PYTHON & JAVA · AI AUTOMATION<br>NETWORKS · VERILOG RESEARCH</p><a class="round-link" href="#work" aria-label="Explore selected work">↘</a></div></div></section><div class="topics"><div class="shell"><span>Software</span><i aria-hidden="true">✳</i><span>AI & automation</span><i aria-hidden="true">✳</i><span>Networks</span><i aria-hidden="true">✳</i><span>Digital systems</span></div></div>
-<section class="section shell" id="work" aria-labelledby="work-title"><div class="section-heading"><div><p class="eyebrow">01 / IDEAS INTO IMPLEMENTATIONS</p><h2 class="section-title" id="work-title">Selected <em>work.</em></h2></div><p>A few things I’ve been building.<br>Open a project to see the thinking behind it.</p></div><div class="work-grid">'''
-home += ''.join(card(p,i+1) for i,p in enumerate(featured))
-home += '''</div></section><section class="section shell catalog-section" aria-labelledby="catalog-title"><div class="filter-row"><h2 id="catalog-title">More to explore ↗</h2><div class="filters" role="group" aria-label="Filter more projects"><button class="filter active" data-filter="all" aria-pressed="true">Everything</button><button class="filter" data-filter="software" aria-pressed="false">Full-stack</button><button class="filter" data-filter="ai" aria-pressed="false">AI & tools</button></div></div><p class="sr-only" id="filter-status" aria-live="polite">Showing 4 projects.</p><div class="catalog-list">'''
-home += ''.join(catalog_row(p,i+1) for i,p in enumerate(more))
-home += '''</div></section><section class="about-section" id="about" aria-labelledby="about-title"><div class="shell section"><div class="about-layout"><div class="about-copy"><p class="eyebrow">02 / THE PERSON BEHIND THE PROJECTS</p><h2 class="section-title" id="about-title">A curious mind.<br>An <em>engineering</em> habit.</h2><p class="about-lead">I like understanding what happens underneath the interface.</p><p>That curiosity takes me from Java backends and Python automation to network protocols and error correction in Verilog. I enjoy connecting the theory to something I can actually implement and inspect.</p><p>I study Information and Communication Technologies at STU FEI in Bratislava and Computer Science at Dnipro University of Technology. Team projects and hackathons give me a place to put those ideas into practice.</p><span class="about-sticker"><span aria-hidden="true">✳</span> MAKE → TEST → LEARN → REPEAT</span></div><div class="skills-block"><h3>My current toolbox.</h3><div class="skill-row"><strong>SOFTWARE</strong><span>Java · Spring Boot · Python · C · SQL<br>REST APIs · React · TypeScript</span></div><div class="skill-row"><strong>AI & TOOLS</strong><span>Azure OpenAI · LLM workflows<br>Filtering · scoring · process automation</span></div><div class="skill-row"><strong>NETWORKS</strong><span>IPv4 / IPv6 · UDP · routing<br>Mesh networks · Docker simulations</span></div><div class="skill-row"><strong>DIGITAL</strong><span>Verilog · error-correcting codes<br>Testbenches · MATLAB · channel modeling</span></div><div class="skill-row"><strong>WORKFLOW</strong><span>Git & GitHub · Linux · Docker<br>Documentation · collaborative development</span></div><button class="print-control" data-print type="button">Print / save portfolio as PDF ↗</button></div></div><div class="education"><div><p class="eyebrow">EDUCATION / BRATISLAVA</p><h3>Slovak University of Technology</h3><p>Faculty of Electrical Engineering and Information Technology<br>Information and Communication Technologies · Bachelor’s studies</p></div><div><p class="eyebrow">EDUCATION / DNIPRO</p><h3>Dnipro University of Technology</h3><p>Computer Science<br>Parallel bachelor’s studies</p></div></div></div></section></main>'''
-home += footer()
-(ROOT / 'index.html').write_text(home)
 
-for i,p in enumerate(PROJECTS):
-    prefix = '../'
-    page = head(f"{p['title']} — Mykhailo Titov", p['summary'], prefix)
-    page += '<div id="top"></div>' + header(prefix)
-    page += f'''<main id="main" class="shell"><p class="case-breadcrumb"><a href="../index.html#work">← All work</a> / {e(p['title'])}</p><div class="case-heading"><p class="eyebrow">{e(p['label'])}</p><h1>{e(p['title'])}</h1><p class="case-summary">{e(p['summary'])}</p></div><div class="case-meta"><div><small>FOCUS</small><strong>{e(p['category'].capitalize())}</strong></div><div><small>TOOLS</small><strong>{e(' · '.join(p['stack']))}</strong></div><div><small>SOURCE</small><strong>{'Public GitHub repository' if p['repo'] else 'Project shared directly'}</strong></div></div>{visual(p,True)}<div class="case-columns"><aside class="case-aside" aria-label="Project page sections"><a href="#problem">01 / The problem</a><a href="#implementation">02 / Implementation</a><a href="#architecture">03 / How it fits together</a><a href="#status">04 / Current state</a></aside><div class="case-content"><section id="problem"><h2>The problem.</h2><p>{e(p['problem'])}</p></section><section id="implementation"><h2>Inside the project.</h2><ul>{''.join(f'<li>{e(item)}</li>' for item in p['implementation'])}</ul></section><section id="architecture"><h2>How it fits together.</h2><div class="architecture">{''.join(f'<div><small>0{j+1}</small><strong>{e(step)}</strong></div>' for j,step in enumerate(p['architecture']))}</div><p>{e(p['learning'])}</p></section><section id="status"><h2>Current state.</h2><div class="status-note"><p>{e(p['status'])}</p></div><div class="case-actions">'''
-    if p['repo']:
-        page += f'<a class="pill-button dark" href="{e(p["repo"])}">Explore the repository ↗</a>'
+def codeword():
+    labels = ['P0', 'P1', 'P2', 'D1', 'P4', 'D2', 'D3', 'D4']
+    bits = ['0', '0', '1', '1', '0', '1', '1', '1']
+    cells = ''.join(
+        f'<li class="{"flipped" if i == 5 else ("parity" if l.startswith("P") else "")}"><small>{l}</small><b>{b}</b><span>{i}</span></li>'
+        for i, (l, b) in enumerate(zip(labels, bits)))
+    return f'''<div class="diagram diagram-code" role="img" aria-label="Extended Hamming (8,4) codeword with bit 5 flipped; syndrome 101 points to position 5.">
+<p class="d-title">Received codeword</p><ol class="bits">{cells}</ol>
+<dl class="checks"><div><dt>Syndrome</dt><dd><code>1 0 1</code> → position 5</dd></div><div><dt>Overall parity</dt><dd>fails → single error, flip bit 5</dd></div><div><dt>Two errors?</dt><dd>parity passes, syndrome ≠ 0 → detect, don’t correct</dd></div></dl></div>'''
+
+
+def document_review():
+    return '''<div class="diagram diagram-doc" role="img" aria-label="Illustration of a doctor's record next to a proposed REDCap form; one field is flagged because two sources disagree.">
+<div class="doc-sheet"><p class="d-title">Doctor’s records</p><i></i><i></i><i class="hl"></i><i></i><i class="short"></i><i></i><i class="hl"></i><i class="short"></i><i></i></div>
+<div class="doc-review"><p class="d-title">REDCap form</p>
+<div class="doc-row"><span>Diagnosis date</span><em class="ok">filled</em></div>
+<div class="doc-row"><span>PSA value</span><em class="ok">filled</em></div>
+<div class="doc-row"><span>Tumour grade</span><em class="warn">2 sources disagree</em></div>
+<div class="doc-row"><span>Diagram region</span><em class="ok">filled</em></div>
+<div class="doc-actions"><span class="d-btn d-primary">Confirm</span><span class="d-btn">Show source</span></div></div></div>'''
+
+
+def agent_pipeline():
+    sources = ''.join(f'<li>{s}</li>' for s in ['Profesia.sk', 'Worki.sk', 'LinkedIn', 'Jobs.sk', 'Reddit'])
+    return f'''<div class="diagram diagram-flow" role="img" aria-label="Job listings from five sources are filtered, scored by Azure OpenAI and written to two Google Sheets.">
+<div class="flow-step"><p class="d-title">Collect</p><ul class="d-chips">{sources}</ul></div>
+<div class="flow-arrow" aria-hidden="true"></div>
+<div class="flow-step"><p class="d-title">Pre-filter</p><ul class="d-list"><li>“for hire” posts</li><li>discussions</li><li>senior-only roles</li><li>already seen</li></ul></div>
+<div class="flow-arrow" aria-hidden="true"></div>
+<div class="flow-step flow-model"><p class="d-title">Azure OpenAI</p><p class="d-big">0–10</p><p class="d-small">relevance score</p></div>
+<div class="flow-arrow" aria-hidden="true"></div>
+<div class="flow-step"><p class="d-title">Google Sheets</p><p class="d-out d-primary">Shortlist · score ≥ 7</p><p class="d-out">Full log · every listing</p></div></div>'''
+
+
+def video_pipeline():
+    steps = ['Voiceover', 'Transcribe', 'Trim silence & fillers', 'Captions', 'Match clips & sound', 'Colour grade', 'Resolve timeline', 'Draft render']
+    clips = ''.join(f'<li style="--w:{w}"><span>{s}</span></li>' for s, w in zip(steps, [1.1, 1, 1.5, 1, 1.5, 1.1, 1.3, 1.1]))
+    return f'''<div class="diagram diagram-timeline" role="img" aria-label="Editing pipeline: {', '.join(steps)}.">
+<p class="d-title">Pipeline</p><ol class="clips">{clips}</ol>
+<div class="tracks" aria-hidden="true"><div class="playhead"></div><span>V1</span><div class="track"><i style="left:4%;width:30%"></i><i style="left:36%;width:34%"></i><i style="left:72%;width:25%"></i></div><span>A1</span><div class="track"><i class="a" style="left:2%;width:96%"></i></div></div></div>'''
+
+
+def study_arch():
+    return '''<div class="diagram diagram-arch" role="img" aria-label="React SPA talks to a Spring Boot API over REST and WebSocket; the API uses Cloud SQL PostgreSQL and Cloud Storage; both run on Cloud Run.">
+<div class="arch-box"><p class="d-title">React SPA</p><p class="d-small">Vite, served by nginx</p></div>
+<div class="arch-link"><code>REST /api/**</code><code>WS /ws/chat</code></div>
+<div class="arch-box arch-core"><p class="d-title">Spring Boot API</p><p class="d-small">JWT and Google OAuth2</p></div>
+<div class="arch-split"><div class="arch-box"><p class="d-title">Cloud SQL</p><p class="d-small">PostgreSQL, 8 tables</p></div><div class="arch-box"><p class="d-title">Cloud Storage</p><p class="d-small">shared files</p></div></div>
+<p class="arch-note">Both services deploy to Cloud Run via Cloud Build</p></div>'''
+
+
+DIAGRAMS = {'kizuna-map': kizuna_map, 'codeword': codeword, 'document-review': document_review,
+            'agent-pipeline': agent_pipeline, 'video-pipeline': video_pipeline, 'study-arch': study_arch}
+
+
+def media(p, prefix='', large=False, eager=False):
+    m = p['media'] if large else p.get('card_media', p['media'])
+    cls = f'media tint-{e(p["color"])}' + (' media-large' if large else '')
+    if m['kind'] == 'image':
+        loading = 'eager' if eager else 'lazy'
+        inner = f'<div class="shot"><img src="{prefix}{e(m["src"])}" width="{m["width"]}" height="{m["height"]}" alt="{e(m["alt"])}" loading="{loading}" decoding="async"></div>'
+        cls += ' media-shot'
     else:
-        page += f'<a class="pill-button dark" href="mailto:{e(CONTENT["email"])}?subject={e(p["id"])}">Ask me about this project ↗</a>'
-    page += '<a class="pill-button" href="../index.html#work">Back to selected work</a></div></section></div></div>'
-    next_p = PROJECTS[(i+1)%len(PROJECTS)]
-    page += f'<a class="case-next" href="{next_p["id"]}.html"><div><p class="eyebrow">KEEP EXPLORING</p><h2>{e(next_p["title"])}</h2></div><span class="round-link" aria-hidden="true">↗</span></a></main>'
-    page += footer(prefix)
-    (ROOT / 'projects' / f'{p["id"]}.html').write_text(page)
+        inner = DIAGRAMS[m['diagram']]()
+    return f'<div class="{cls}">{inner}</div>'
 
-notes = '''# Content sources and editing
 
-This is a buildless static site ready for GitHub Pages. No server, npm install or API keys are required.
+# ---------------------------------------------------------------- home page parts
 
-## Editing
+def stack():
+    bands = ''
+    for layer in C['layers']:
+        links = ''.join(f'<li><a href="projects/{p}.html">{e(P[p]["title"])}</a></li>' for p in layer['projects'])
+        bands += f'''<li class="band tint-{e(layer['color'])}"><div class="band-head"><h3>{e(layer['name'])}</h3><p>{e(layer['note'])}</p></div><ul class="band-projects">{links}</ul></li>'''
+    return f'''<figure class="stack" aria-labelledby="stack-caption"><ol class="bands">{bands}</ol>
+<figcaption id="stack-caption">Every project, by the layer of the system it works at.</figcaption></figure>'''
 
-- Edit `site-content.json` for projects and public contact details.
-- Run `python3 build.py` to regenerate `index.html` and `projects/*.html`.
-- Edit `styles.css` for colors and layout; edit `script.js` for progressive enhancements.
-- Upload the generated pages and assets to the root of `TitovMykhailo.github.io`.
-- Keep `CNAME` as `titovmykhailo.me` and configure GitHub Pages to serve `main` / root.
-- The zip already contains generated pages. Running the generator is optional unless you edit project data.
 
-## Research notes
+def metrics(p, cls='metrics'):
+    if not p['metrics']:
+        return ''
+    return f'<ul class="{cls}">' + ''.join(f'<li><b>{e(m["value"])}</b><span>{e(m["label"])}</span></li>' for m in p['metrics']) + '</ul>'
 
-Project copy was checked against the following public repository files on 21 October 2026. The underlying applications were not run or independently benchmarked while building this portfolio.
 
-'''
-for p in PROJECTS:
-    notes += f'- {p["title"]}: {p["repo"] or "User-supplied project details"}; {p["source"]}.\n'
-notes += '''
-Public contact details and the current software/AI focus came from `TitovMykhailo/TitovMykhailo/README.md`.
+def chips(items, limit=None):
+    items = items[:limit] if limit else items
+    return '<ul class="chips">' + ''.join(f'<li>{e(i)}</li>' for i in items) + '</ul>'
 
-16-QAM Mapper is excluded at Mykhailo’s explicit request; it is not his project.
 
-All project previews are original code-native diagrams or interface illustrations, labelled as such. They are not copied screenshots, working application demos, measured results or evidence of production use. No real medical documents or patient data are included.
+def case_card(p, index):
+    layer = layer_of(p)
+    code = ext(p['repo'], 'Code on GitHub', 'text-link') if p['repo'] else ''
+    context = f'<span>{e(p["team"])}</span>' if p.get('team') else ''
+    facts = ''
+    if not p['metrics'] and p['facts']:
+        facts = '<ul class="metrics metrics-facts">' + ''.join(f'<li><b>{e(f["items"][0])}</b><span>{e(", ".join(f["items"][1:]) or f["label"])}</span></li>' for f in p['facts'][:2]) + '</ul>'
+    return f'''<article class="case" aria-labelledby="case-{e(p['id'])}">
+<div class="case-text">
+<p class="case-meta"><span class="layer-tag tint-{e(layer['color'])}">{e(layer['name'])}</span><span>{e(p['year'])}</span>{context}</p>
+<h3 id="case-{e(p['id'])}">{e(p['title'])}</h3>
+<p class="case-outcome">{e(p['outcome'])}</p>
+{metrics(p) or facts}
+{chips(p['stack'], 5)}
+<div class="case-actions"><a class="btn btn-dark" href="projects/{e(p['id'])}.html">Read the case study<span class="sr-only">: {e(p['title'])}</span></a><span class="read-time">{reading_time(p)} min read</span>{code}</div>
+</div>
+<a class="case-media" href="projects/{e(p['id'])}.html" tabindex="-1" aria-hidden="true">{media(p, eager=index == 0)}</a>
+</article>'''
 
-Design references: junhyungpark.com (spacious project-led structure) and whyramachandran.design (warm background, orange accent, expressive typography). The implementation is original and uses no images, brand marks or authored case-study content from those sites.
 
-## Checks and browser support
+def projects_table():
+    order = FEATURED + [p for p in PROJECTS if p not in FEATURED]
+    rows = ''
+    for p in order:
+        layer = layer_of(p)
+        code = ext(p['repo'], 'Code', 'text-link') if p['repo'] else '<span class="muted">Private</span>'
+        rows += f'''<tr><th scope="row"><a href="projects/{e(p['id'])}.html">{e(p['title'])}</a></th><td>{e(p['subtitle'])}</td><td><span class="layer-tag tint-{e(layer['color'])}">{e(layer['name'])}</span></td><td class="num">{e(p['year'])}</td><td>{code}</td></tr>'''
+    return f'''<div class="table-wrap"><table class="projects-table"><caption class="sr-only">All projects</caption>
+<thead><tr><th scope="col">Project</th><th scope="col">What it is</th><th scope="col">Layer</th><th scope="col">Year</th><th scope="col">Source</th></tr></thead>
+<tbody>{rows}</tbody></table></div>'''
 
-The site uses semantic HTML, visible keyboard focus, native links/buttons, responsive CSS, reduced-motion support and a printable layout. External Google Fonts are optional; system fallbacks are provided. Project descriptions and links remain available without JavaScript. JavaScript adds filters, reveal transitions, print and copy-email controls.
-'''
-(ROOT / 'SOURCE_NOTES.md').write_text(notes)
-print(f'Generated index and {len(PROJECTS)} project pages.')
+
+def hackathons():
+    cards = ''
+    for h in C.get('hackathons', []):
+        badge = f'<span class="badge">{e(h["result"])}</span>' if h.get('result') else ''
+        meta = [x for x in (h.get('where'), h.get('year'), h.get('team')) if x]
+        meta_html = ''.join(f'<span>{e(m)}</span>' for m in meta)
+        note = f'<p class="hack-note">{e(h["note"])}</p>' if h.get('note') else ''
+        points = '<ul class="hack-points">' + ''.join(f'<li>{e(pt)}</li>' for pt in h['points']) + '</ul>' if h.get('points') else ''
+        link = f'<a class="text-link hack-link" href="projects/{e(h["project"])}.html">Read the case study<span class="sr-only">: {e(P[h["project"]]["title"])}</span></a>' if h.get('project') else ''
+        cards += f'''<li class="hack{' hack-award' if h.get('result') else ''}"><div class="hack-top"><h3>{e(h['event'])}</h3>{badge}</div>
+<p class="hack-meta">{meta_html}</p>{note}<p class="hack-title">{e(h['title'])}</p><p class="hack-summary">{e(h['summary'])}</p>{points}{link}</li>'''
+    return f'''<section class="section hackathons" id="hackathons" aria-labelledby="hackathons-title"><div class="wrap">
+<h2 id="hackathons-title">Hackathons</h2><p class="section-lead">Team projects built against the clock, from a hospital’s documentation to a university’s heating bill.</p>
+<ul class="hack-grid">{cards}</ul></div></section>'''
+
+
+def portrait(prefix=''):
+    if C.get('photo'):
+        return f'<img class="portrait" src="{prefix}{e(C["photo"])}" width="480" height="560" alt="Portrait of {e(C["name"])}">'
+    return f'<div class="portrait portrait-mono" aria-hidden="true"><span>{e(C["initials"])}</span></div>'
+
+
+def about():
+    a = C['about']
+    edu = ''.join(f'<li><b>{e(x["school"])}</b><span>{e(x["program"])}{(" · " + e(x["years"])) if x.get("years") else ""}</span></li>' for x in C['education'])
+    langs = ''
+    if a.get('languages'):
+        langs = '<div class="about-block"><h3>Languages</h3><ul class="plain-list">' + ''.join(f'<li><b>{e(l["name"])}</b><span>{e(l["level"])}</span></li>' for l in a['languages']) + '</ul></div>'
+    timeline = ''.join(f'<li><span class="t-year">{e(t["year"])}</span><div><a href="projects/{e(t["project"])}.html">{e(t["title"])}</a><p>{e(t["text"])}</p></div></li>' for t in C['timeline'])
+    return f'''<section class="section about" id="about" aria-labelledby="about-title"><div class="wrap about-grid">
+<div class="about-side">{portrait()}<p class="about-name">{e(C['name'])}</p><p class="muted">{e(C['location'])}</p></div>
+<div class="about-main">
+<h2 id="about-title">About me</h2>
+{''.join(f'<p class="{"about-lead" if i == 0 else ""}">{e(t)}</p>' for i, t in enumerate(a['bio']))}
+<div class="about-block looking"><h3>What I’m looking for</h3><p>{e(a['looking_for'])}</p></div>
+<div class="about-block"><h3>Education</h3><ul class="plain-list">{edu}</ul></div>
+{langs}
+<div class="about-block"><h3>Recent work</h3><ol class="timeline">{timeline}</ol></div>
+</div></div></section>'''
+
+
+def toolbox():
+    groups = ''
+    for g in C['toolbox']:
+        used = ''
+        if g['used_in']:
+            used = '<p class="used-in">Used in ' + ', '.join(f'<a href="projects/{u}.html">{e(P[u]["title"])}</a>' for u in g['used_in']) + '</p>'
+        groups += f'<li class="tool"><h3>{e(g["group"])}</h3>{chips(g["items"])}{used}</li>'
+    return f'''<section class="section toolbox" aria-labelledby="toolbox-title"><div class="wrap">
+<h2 id="toolbox-title">Toolbox</h2><p class="section-lead">What I work with, and where you can see it in use.</p>
+<ul class="tool-grid">{groups}</ul></div></section>'''
+
+
+# ---------------------------------------------------------------- index
+
+def json_ld():
+    data = {
+        '@context': 'https://schema.org', '@type': 'Person', 'name': C['name'], 'url': SITE,
+        'jobTitle': C['role'], 'email': f"mailto:{C['email']}",
+        'address': {'@type': 'PostalAddress', 'addressLocality': 'Bratislava', 'addressCountry': 'SK'},
+        'alumniOf': [{'@type': 'CollegeOrUniversity', 'name': x['school']} for x in C['education']],
+        'sameAs': [C['github'], C['linkedin']],
+        'award': [f"{h['result']}, {h['event']}" for h in C.get('hackathons', []) if h.get('result')],
+        'knowsAbout': ['Java', 'Spring Boot', 'React', 'Python', 'Network protocols', 'IPv6', 'Verilog', 'LLM automation'],
+    }
+    return f'\n<script type="application/ld+json">{json.dumps(data, ensure_ascii=False)}</script>'
+
+
+def build_index():
+    out = head(f"{C['name']} — {C['role']}", C['meta_description'], extra=json_ld())
+    out += header()
+    out += f'''<main id="main">
+<section class="hero" aria-labelledby="hero-title"><div class="wrap">
+<p class="status"><span class="status-dot" aria-hidden="true"></span>{e(C['status'])} in {e(C['location'].split(',')[0])}</p>
+<h1 id="hero-title" class="display">{e(C['name'])}</h1>
+<div class="hero-grid">
+<div class="hero-copy">
+<p class="hero-role">{e(C['role'])}</p>
+<p class="hero-lead">{e(C['lead'])}</p>
+<div class="hero-actions"><a class="btn btn-signal" href="#work">See the projects</a><a class="btn btn-outline" href="{e(C['cv_pdf'])}" download>Download CV (PDF)</a></div>
+<p class="hero-links">{ext(C['github'], 'GitHub', 'text-link')}{ext(C['linkedin'], 'LinkedIn', 'text-link')}<a class="text-link" href="mailto:{e(C['email'])}">Email</a></p>
+</div>
+{stack()}
+</div></div></section>
+<section class="section work" id="work" aria-labelledby="work-title"><div class="wrap">
+<h2 id="work-title">Selected work</h2><p class="section-lead">Four projects in depth. Screens and numbers come from the code itself.</p>
+<div class="cases">{''.join(case_card(p, i) for i, p in enumerate(FEATURED))}</div>
+</div></section>
+<section class="section all-projects" id="projects" aria-labelledby="projects-title"><div class="wrap">
+<h2 id="projects-title">All projects</h2><p class="section-lead">Each one has a case study page with what I built and how.</p>
+{projects_table()}
+</div></section>
+{hackathons()}
+{about()}
+{toolbox()}
+</main>'''
+    out += contact() + footer()
+    (ROOT / 'index.html').write_text(out, encoding='utf-8')
+
+
+# ---------------------------------------------------------------- project pages
+
+def facts_block(p):
+    if not p['facts']:
+        return ''
+    items = ''
+    for f in p['facts']:
+        if f.get('code'):
+            items += f'<div class="fact fact-code"><h3>{e(f["label"])}</h3><pre><code>{e(f["code"])}</code></pre></div>'
+        else:
+            items += f'<div class="fact"><h3>{e(f["label"])}</h3>{chips(f["items"])}</div>'
+    return f'<section id="facts" aria-labelledby="facts-h"><h2 id="facts-h">At a glance</h2><div class="facts">{items}</div></section>'
+
+
+def gallery(p):
+    if not p['gallery']:
+        return ''
+    figs = ''.join(f'<figure class="gallery-item"><div class="media tint-{e(p["color"])} media-shot"><div class="shot"><img src="../{e(g["src"])}" width="{g["width"]}" height="{g["height"]}" alt="{e(g["alt"])}" loading="lazy" decoding="async"></div></div><figcaption>{e(g["caption"])}</figcaption></figure>' for g in p['gallery'])
+    return f'<section id="screens" aria-labelledby="screens-h"><h2 id="screens-h">Screens</h2>{figs}</section>'
+
+
+def build_project(p, i):
+    layer = layer_of(p)
+    prev_p = PROJECTS[(i - 1) % len(PROJECTS)]
+    next_p = PROJECTS[(i + 1) % len(PROJECTS)]
+    rows = f'<div><dt>Year</dt><dd>{e(p["year"])}</dd></div><div><dt>Layer</dt><dd>{e(layer["name"])}</dd></div>'
+    if p.get('role'):
+        rows += f'<div><dt>My role</dt><dd>{e(p["role"])}</dd></div>'
+    if p.get('team'):
+        rows += f'<div><dt>Team</dt><dd>{e(p["team"])}</dd></div>'
+    links = []
+    if p['repo']:
+        links.append(ext(p['repo'], 'Code on GitHub', 'text-link'))
+    if p.get('demo'):
+        links.append(ext(p['demo'], 'Live demo', 'text-link'))
+    if not links:
+        links.append(f'<a class="text-link" href="mailto:{e(C["email"])}?subject={e(p["title"])}">Ask me about it</a>')
+    rows += f'<div><dt>Links</dt><dd class="dd-links">{"".join(links)}</dd></div>'
+    toc = [('problem', 'The problem'), ('built', 'What I built'), ('how', 'How it works')]
+    if p['facts']:
+        toc.append(('facts', 'At a glance'))
+    if p['gallery']:
+        toc.append(('screens', 'Screens'))
+    toc += [('results', 'Results'), ('learned', 'What I learned')]
+    toc_html = ''.join(f'<li><a href="#{a}">{t}</a></li>' for a, t in toc)
+    steps = ''.join(f'<li><span>{j + 1}</span>{e(s)}</li>' for j, s in enumerate(p['architecture']))
+    out = head(f"{p['title']} — {C['name']}", p['outcome'] + '. ' + p['summary'], '../', f"projects/{p['id']}.html")
+    out += header('../', 'work')
+    out += f'''<main id="main" class="case-page">
+<div class="wrap">
+<nav class="breadcrumb" aria-label="Breadcrumb"><a href="../index.html#work">Work</a><span aria-hidden="true">/</span><span aria-current="page">{e(p['title'])}</span></nav>
+<header class="case-head">
+<p class="case-meta"><span class="layer-tag tint-{e(layer['color'])}">{e(layer['name'])}</span><span>{reading_time(p)} min read</span></p>
+<h1 class="case-title">{e(p['title'])}</h1>
+<p class="case-outcome case-outcome-lg">{e(p['outcome'])}</p>
+</header>
+<div class="tldr"><dl class="tldr-list">{rows}</dl>{metrics(p, 'metrics metrics-lg')}<div class="tldr-stack"><h2 class="tldr-h">Stack</h2>{chips(p['stack'])}</div></div>
+<figure class="case-hero">{media(p, '../', large=True, eager=True)}<figcaption>{e(p.get('media_note', ''))}</figcaption></figure>
+<div class="case-body">
+<aside class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol>{toc_html}</ol></aside>
+<article class="prose">
+<p class="prose-lead">{e(p['summary'])}</p>
+<section id="problem" aria-labelledby="problem-h"><h2 id="problem-h">The problem</h2><p>{e(p['problem'])}</p></section>
+<section id="built" aria-labelledby="built-h"><h2 id="built-h">What I built</h2><ul>{''.join(f'<li>{inline(x)}</li>' for x in p['implementation'])}</ul></section>
+<section id="how" aria-labelledby="how-h"><h2 id="how-h">How it works</h2><ol class="steps">{steps}</ol></section>
+{facts_block(p)}
+{gallery(p)}
+<section id="results" aria-labelledby="results-h"><h2 id="results-h">Results</h2><p>{inline(p['results'])}</p></section>
+<section id="learned" aria-labelledby="learned-h"><h2 id="learned-h">What I learned</h2><p>{inline(p['learning'])}</p></section>
+</article>
+</div>
+<nav class="pager" aria-label="More projects"><a class="pager-prev" href="{e(prev_p['id'])}.html"><span>Previous project</span><b>{e(prev_p['title'])}</b></a><a class="pager-next" href="{e(next_p['id'])}.html"><span>Next project</span><b>{e(next_p['title'])}</b></a></nav>
+</div></main>'''
+    out += contact('../') + footer('../')
+    (ROOT / 'projects' / f"{p['id']}.html").write_text(out, encoding='utf-8')
+
+
+# ---------------------------------------------------------------- resume
+
+def build_resume():
+    a = C['about']
+    def proj_line(p):
+        m = '; '.join(f'{x["value"]} {x["label"]}' for x in p['metrics'] if not re.search(r'(?<![\d.])' + re.escape(x['value']) + r'(?!\d)', p['outcome']))
+        return f'''<li><div class="cv-row"><b>{e(p['title'])}</b><span>{e(p['year'])}</span></div><p>{e(p['outcome'])}.{(' ' + e(m) + '.') if m else ''}</p><p class="cv-stack">{e(', '.join(p['stack'][:6]))}</p></li>'''
+    others = [p for p in PROJECTS if p not in FEATURED]
+    def cv_hack(h):
+        if h.get('project'):
+            return f'{e(h["title"])} (see Selected projects).'
+        if h.get('points'):
+            return f'{e(h["title"])}. {e(h["summary"].split(". ")[-1])}'
+        return e(h['summary'])
+    skills = ''.join(f'<li><b>{e(g["group"])}</b><span>{e(", ".join(g["items"]))}</span></li>' for g in C['toolbox'])
+    edu = ''.join(f'<li><div class="cv-row"><b>{e(x["school"])}</b><span>{e(x["years"] or "")}</span></div><p>{e(x["program"])}</p></li>' for x in C['education'])
+    langs = ''
+    if a.get('languages'):
+        langs = '<section><h2>Languages</h2><p>' + ', '.join(f'{e(l["name"])} ({e(l["level"])})' for l in a['languages']) + '</p></section>'
+    out = head(f"Resume — {C['name']}", f"Resume of {C['name']}, {C['role']} in Bratislava.", '', 'resume.html')
+    out += header('', 'resume', home='index.html')
+    out += f'''<main id="main" class="resume-page"><div class="wrap">
+<div class="resume-tools"><p>A one-page summary. The PDF has the same content.</p><div><a class="btn btn-dark" href="{e(C['cv_pdf'])}" download>Download PDF</a><button class="btn btn-outline" type="button" data-print>Print</button></div></div>
+<article class="cv">
+<header class="cv-head"><div><h1>{e(C['name'])}</h1><p class="cv-role">{e(C['role'])}, {e(C['location'])}</p></div>
+<ul class="cv-contacts"><li><a href="mailto:{e(C['email'])}">{e(C['email'])}</a></li><li><a href="{e(SITE)}">{e(SITE.replace('https://', ''))}</a></li><li><a href="{e(C['github'])}">{e(C['github'].replace('https://', ''))}</a></li><li><a href="{e(C['linkedin'])}">{e(C['linkedin'].replace('https://www.', ''))}</a></li></ul></header>
+<section><h2>Profile</h2><p>{e(a['bio'][0])} {e(a['bio'][2].split('. I also')[0].rstrip('.'))}. {e(a['looking_for'])}</p></section>
+<section><h2>Education</h2><ul class="cv-list">{edu}</ul></section>
+<section><h2>Selected projects</h2><ul class="cv-list">{''.join(proj_line(p) for p in FEATURED)}</ul></section>
+<section><h2>Hackathons</h2><ul class="cv-list cv-compact">{''.join(f'<li><div class="cv-row"><b>{e(h["event"])}{(" — " + e(h["result"])) if h.get("result") else ""}</b><span>{e(h.get("year") or "")}</span></div><p>{cv_hack(h)}</p></li>' for h in C.get('hackathons', []))}</ul></section>
+<section><h2>More projects</h2><ul class="cv-list cv-compact">{''.join(f'<li><p><b class="cv-ink">{e(p["title"])}</b> — {e(p["outcome"])}.</p></li>' for p in others)}</ul></section>
+<section><h2>Skills</h2><ul class="cv-skills">{skills}</ul></section>
+{langs}
+</article>
+</div></main>'''
+    out += footer()
+    (ROOT / 'resume.html').write_text(out, encoding='utf-8')
+
+
+# ---------------------------------------------------------------- extras
+
+def build_extras():
+    urls = ['', 'resume.html'] + [f"projects/{p['id']}.html" for p in PROJECTS]
+    sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    sitemap += ''.join(f'  <url><loc>{SITE}/{u}</loc><lastmod>{TODAY}</lastmod></url>\n' for u in urls) + '</urlset>\n'
+    (ROOT / 'sitemap.xml').write_text(sitemap, encoding='utf-8')
+    (ROOT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n', encoding='utf-8')
+
+    todo = ['# Content to add', '', 'Generated by `build.py` from empty fields in `site-content.json`. Fill them in, run `python3 build.py`, then `python3 make_assets.py` to refresh the PDF and preview image.', '']
+    if not C.get('photo'):
+        todo.append('- [ ] **Photo** — add a portrait (e.g. `assets/photo.webp`, about 480×560) and set `"photo"` to its path. Until then the site shows an "MT" monogram.')
+    if not C['about'].get('languages'):
+        todo.append('- [ ] **Languages** — add `"languages": [{"name": "English", "level": "C1"}, …]` under `about`.')
+    for x in C['education']:
+        if not x.get('years'):
+            todo.append(f'- [ ] **Education years** — `{x["school"]}`: add `"years"`, e.g. `"2024 – 2028 (expected)"`.')
+    for h in C.get('hackathons', []):
+        if not h.get('year'):
+            todo.append(f'- [ ] **{h["event"]}** — add `"year"` (and `"where"` if useful) under `hackathons`.')
+    todo.append('- [ ] **Status and target role** — check `"status"` and `about.looking_for`; they were written from your GitHub profile and may not match what you want.')
+    for p in PROJECTS:
+        missing = []
+        if not p.get('role'):
+            missing.append('`role` (what you personally did)')
+        if p.get('team') and 'size' not in p.get('team', ''):
+            missing.append('team size in `team`')
+        if not p.get('demo') and p['layer'] == 'backend':
+            missing.append('`demo` URL if it is deployed')
+        if p['media']['kind'] == 'diagram' and p['id'] in ('prostapaper', 'secded', 'study-group'):
+            missing.append('real screenshots or result plots for `gallery`')
+        if not p['metrics']:
+            missing.append('1–3 real numbers for `metrics`')
+        if missing:
+            todo.append(f'- [ ] **{p["title"]}** — ' + ', '.join(missing) + '.')
+    (ROOT / 'TODO_CONTENT.md').write_text('\n'.join(todo) + '\n', encoding='utf-8')
+
+
+if __name__ == '__main__':
+    (ROOT / 'projects').mkdir(exist_ok=True)
+    build_index()
+    for i, p in enumerate(PROJECTS):
+        build_project(p, i)
+    build_resume()
+    build_extras()
+    print(f'Generated index.html, resume.html and {len(PROJECTS)} project pages.')
