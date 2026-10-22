@@ -147,14 +147,14 @@ def codeword():
 
 
 def document_review():
-    return '''<div class="diagram diagram-doc" role="img" aria-label="Illustration of a pathology report next to proposed registry fields awaiting review.">
-<div class="doc-sheet"><p class="d-title">Pathology report</p><i></i><i></i><i class="hl"></i><i></i><i class="short"></i><i></i><i class="hl"></i><i class="short"></i><i></i></div>
-<div class="doc-review"><p class="d-title">Proposed record</p>
-<div class="doc-row"><span>Specimen type</span><em class="ok">proposed</em></div>
-<div class="doc-row"><span>Tumour grade</span><em class="warn">needs review</em></div>
-<div class="doc-row"><span>Margin status</span><em class="ok">proposed</em></div>
-<div class="doc-row"><span>Diagram region</span><em class="ok">proposed</em></div>
-<div class="doc-actions"><span class="d-btn d-primary">Confirm</span><span class="d-btn">Edit</span></div></div></div>'''
+    return '''<div class="diagram diagram-doc" role="img" aria-label="Illustration of a doctor's record next to a proposed REDCap form; one field is flagged because two sources disagree.">
+<div class="doc-sheet"><p class="d-title">Doctor’s records</p><i></i><i></i><i class="hl"></i><i></i><i class="short"></i><i></i><i class="hl"></i><i class="short"></i><i></i></div>
+<div class="doc-review"><p class="d-title">REDCap form</p>
+<div class="doc-row"><span>Diagnosis date</span><em class="ok">filled</em></div>
+<div class="doc-row"><span>PSA value</span><em class="ok">filled</em></div>
+<div class="doc-row"><span>Tumour grade</span><em class="warn">2 sources disagree</em></div>
+<div class="doc-row"><span>Diagram region</span><em class="ok">filled</em></div>
+<div class="doc-actions"><span class="d-btn d-primary">Confirm</span><span class="d-btn">Show source</span></div></div></div>'''
 
 
 def agent_pipeline():
@@ -256,6 +256,22 @@ def projects_table():
 <tbody>{rows}</tbody></table></div>'''
 
 
+def hackathons():
+    cards = ''
+    for h in C.get('hackathons', []):
+        badge = f'<span class="badge">{e(h["result"])}</span>' if h.get('result') else ''
+        meta = [x for x in (h.get('where'), h.get('year'), h.get('team')) if x]
+        meta_html = ''.join(f'<span>{e(m)}</span>' for m in meta)
+        note = f'<p class="hack-note">{e(h["note"])}</p>' if h.get('note') else ''
+        points = '<ul class="hack-points">' + ''.join(f'<li>{e(pt)}</li>' for pt in h['points']) + '</ul>' if h.get('points') else ''
+        link = f'<a class="text-link hack-link" href="projects/{e(h["project"])}.html">Read the case study<span class="sr-only">: {e(P[h["project"]]["title"])}</span></a>' if h.get('project') else ''
+        cards += f'''<li class="hack{' hack-award' if h.get('result') else ''}"><div class="hack-top"><h3>{e(h['event'])}</h3>{badge}</div>
+<p class="hack-meta">{meta_html}</p>{note}<p class="hack-title">{e(h['title'])}</p><p class="hack-summary">{e(h['summary'])}</p>{points}{link}</li>'''
+    return f'''<section class="section hackathons" id="hackathons" aria-labelledby="hackathons-title"><div class="wrap">
+<h2 id="hackathons-title">Hackathons</h2><p class="section-lead">Team projects built against the clock, from a hospital’s documentation to a university’s heating bill.</p>
+<ul class="hack-grid">{cards}</ul></div></section>'''
+
+
 def portrait(prefix=''):
     if C.get('photo'):
         return f'<img class="portrait" src="{prefix}{e(C["photo"])}" width="480" height="560" alt="Portrait of {e(C["name"])}">'
@@ -302,6 +318,7 @@ def json_ld():
         'address': {'@type': 'PostalAddress', 'addressLocality': 'Bratislava', 'addressCountry': 'SK'},
         'alumniOf': [{'@type': 'CollegeOrUniversity', 'name': x['school']} for x in C['education']],
         'sameAs': [C['github'], C['linkedin']],
+        'award': [f"{h['result']}, {h['event']}" for h in C.get('hackathons', []) if h.get('result')],
         'knowsAbout': ['Java', 'Spring Boot', 'React', 'Python', 'Network protocols', 'IPv6', 'Verilog', 'LLM automation'],
     }
     return f'\n<script type="application/ld+json">{json.dumps(data, ensure_ascii=False)}</script>'
@@ -331,6 +348,7 @@ def build_index():
 <h2 id="projects-title">All projects</h2><p class="section-lead">Each one has a case study page with what I built and how.</p>
 {projects_table()}
 </div></section>
+{hackathons()}
 {about()}
 {toolbox()}
 </main>'''
@@ -420,9 +438,15 @@ def build_project(p, i):
 def build_resume():
     a = C['about']
     def proj_line(p):
-        m = '; '.join(f'{x["value"]} {x["label"]}' for x in p['metrics'] if f'{x["value"]} ' not in p['outcome'])
-        return f'''<li><div class="cv-row"><b>{e(p['title'])}</b><span>{e(p['year'])}</span></div><p>{e(p['outcome'])}.{(' ' + e(m) + '.') if m else ''}</p><p class="cv-stack">{e(', '.join(p['stack'][:6]))}{(' · ' + e(p['repo'].replace('https://', ''))) if p['repo'] else ''}</p></li>'''
+        m = '; '.join(f'{x["value"]} {x["label"]}' for x in p['metrics'] if not re.search(r'(?<![\d.])' + re.escape(x['value']) + r'(?!\d)', p['outcome']))
+        return f'''<li><div class="cv-row"><b>{e(p['title'])}</b><span>{e(p['year'])}</span></div><p>{e(p['outcome'])}.{(' ' + e(m) + '.') if m else ''}</p><p class="cv-stack">{e(', '.join(p['stack'][:6]))}</p></li>'''
     others = [p for p in PROJECTS if p not in FEATURED]
+    def cv_hack(h):
+        if h.get('project'):
+            return f'{e(h["title"])} (see Selected projects).'
+        if h.get('points'):
+            return f'{e(h["title"])}. {e(h["summary"].split(". ")[-1])}'
+        return e(h['summary'])
     skills = ''.join(f'<li><b>{e(g["group"])}</b><span>{e(", ".join(g["items"]))}</span></li>' for g in C['toolbox'])
     edu = ''.join(f'<li><div class="cv-row"><b>{e(x["school"])}</b><span>{e(x["years"] or "")}</span></div><p>{e(x["program"])}</p></li>' for x in C['education'])
     langs = ''
@@ -435,10 +459,11 @@ def build_resume():
 <article class="cv">
 <header class="cv-head"><div><h1>{e(C['name'])}</h1><p class="cv-role">{e(C['role'])}, {e(C['location'])}</p></div>
 <ul class="cv-contacts"><li><a href="mailto:{e(C['email'])}">{e(C['email'])}</a></li><li><a href="{e(SITE)}">{e(SITE.replace('https://', ''))}</a></li><li><a href="{e(C['github'])}">{e(C['github'].replace('https://', ''))}</a></li><li><a href="{e(C['linkedin'])}">{e(C['linkedin'].replace('https://www.', ''))}</a></li></ul></header>
-<section><h2>Profile</h2><p>{e(a['bio'][0])} {e(a['bio'][2])} {e(a['looking_for'])}</p></section>
+<section><h2>Profile</h2><p>{e(a['bio'][0])} {e(a['bio'][2].split('. I also')[0].rstrip('.'))}. {e(a['looking_for'])}</p></section>
 <section><h2>Education</h2><ul class="cv-list">{edu}</ul></section>
 <section><h2>Selected projects</h2><ul class="cv-list">{''.join(proj_line(p) for p in FEATURED)}</ul></section>
-<section><h2>More projects</h2><ul class="cv-list cv-compact">{''.join(f'<li><div class="cv-row"><b>{e(p["title"])}</b><span>{e(p["year"])}</span></div><p>{e(p["outcome"])}.</p></li>' for p in others)}</ul></section>
+<section><h2>Hackathons</h2><ul class="cv-list cv-compact">{''.join(f'<li><div class="cv-row"><b>{e(h["event"])}{(" — " + e(h["result"])) if h.get("result") else ""}</b><span>{e(h.get("year") or "")}</span></div><p>{cv_hack(h)}</p></li>' for h in C.get('hackathons', []))}</ul></section>
+<section><h2>More projects</h2><ul class="cv-list cv-compact">{''.join(f'<li><p><b class="cv-ink">{e(p["title"])}</b> — {e(p["outcome"])}.</p></li>' for p in others)}</ul></section>
 <section><h2>Skills</h2><ul class="cv-skills">{skills}</ul></section>
 {langs}
 </article>
@@ -464,6 +489,9 @@ def build_extras():
     for x in C['education']:
         if not x.get('years'):
             todo.append(f'- [ ] **Education years** — `{x["school"]}`: add `"years"`, e.g. `"2024 – 2028 (expected)"`.')
+    for h in C.get('hackathons', []):
+        if not h.get('year'):
+            todo.append(f'- [ ] **{h["event"]}** — add `"year"` (and `"where"` if useful) under `hackathons`.')
     todo.append('- [ ] **Status and target role** — check `"status"` and `about.looking_for`; they were written from your GitHub profile and may not match what you want.')
     for p in PROJECTS:
         missing = []

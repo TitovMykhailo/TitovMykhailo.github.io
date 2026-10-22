@@ -367,6 +367,7 @@ a:hover>.ext{transform:translate(2px,-2px)}
 .cv-list p{color:var(--ink-2)}
 .cv-stack{font-size:13.5px;color:var(--ink-3)!important}
 .cv-compact{gap:8px}
+.cv-ink{color:var(--ink)}
 .cv-skills{display:grid;gap:6px}
 .cv-skills li{display:grid;grid-template-columns:150px 1fr;gap:12px}
 .cv-skills span{color:var(--ink-2)}
@@ -439,17 +440,37 @@ a:hover>.ext{transform:translate(2px,-2px)}
   .site-header,.site-footer,.skip,.resume-tools,.contact,.toc,.pager,.hero-actions,.case-actions{display:none!important}
   .resume-page{padding:0}
   .resume-page .wrap{padding:0;max-width:none}
-  .cv{border:0;border-radius:0;padding:0;max-width:none;font-size:9.3pt;line-height:1.36;background:#fff}
+  .cv{border:0;border-radius:0;padding:0;max-width:none;font-size:9.1pt;line-height:1.34;background:#fff}
   .cv h1{font-size:24pt}
-  .cv section{margin-top:9pt}
+  .cv section{margin-top:8pt}
+  .cv h2{break-after:avoid}
   .cv h2{font-size:10.5pt;margin-bottom:5pt;padding-bottom:3pt}
   .cv-head{padding-bottom:10pt}
   .cv-list{gap:6pt}
   .cv-compact{gap:4pt}
   .cv-contacts{font-size:9pt}
   .cv-stack{font-size:8.6pt}
-  .cv-skills{gap:2pt}
-  .cv-skills li{grid-template-columns:110pt 1fr}
+  .cv-skills{grid-template-columns:1fr 1fr;gap:3pt 18pt}
+  .cv-skills li{display:block}
+  .cv-skills b::after{content:': '}
   a{text-decoration:none}
   .bands::before,.band{animation:none}
 }
+
+/* ---------- hackathons */
+.hack-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:40px;align-items:start}
+.hack{display:flex;flex-direction:column;gap:12px;padding:26px;background:var(--card);border:1px solid var(--rule);border-radius:var(--r-lg)}
+.hack-award{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.hack-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.hack h3{font-size:21px;font-weight:750;font-stretch:112%;letter-spacing:-.01em}
+.badge{flex:none;padding:5px 11px;border-radius:999px;background:var(--signal);color:var(--ink);font-size:14px;font-weight:700;white-space:nowrap}
+.hack-meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--ink-3)}
+.hack-note{font-size:14px;color:var(--ink-2);padding:8px 12px;background:var(--paper-2);border-radius:var(--r-sm)}
+.hack-title{font-size:18px;font-weight:650;line-height:1.3;margin-top:4px}
+.hack-summary{font-size:16px;color:var(--ink-2)}
+.hack-points{display:grid;gap:8px;margin-top:4px}
+.hack-points li{position:relative;padding-left:18px;font-size:15px;line-height:1.5;color:var(--ink-2)}
+.hack-points li::before{content:'';position:absolute;left:1px;top:.6em;width:7px;height:7px;border-radius:2px;background:var(--signal)}
+.hack-link{align-self:flex-start;margin-top:4px}
+@media (max-width:1024px){.hack-grid{grid-template-columns:1fr 1fr}.hack-award{grid-column:1/-1}}
+@media (max-width:720px){.hack-grid{grid-template-columns:1fr}}

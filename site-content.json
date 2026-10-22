@@ -17,7 +17,7 @@
     "bio": [
       "I study Information and Communication Technologies at STU FEI in Bratislava and Computer Science in parallel at Dnipro University of Technology.",
       "I like knowing what happens underneath an interface, so my projects go deep in different directions: a mesh-routing protocol with 167 passing tests, a Verilog decoder, Java backends with JWT and WebSockets, and Python agents built on LLM APIs.",
-      "Right now I’m building Python agents on top of GPT and Claude APIs, tools for evaluating LLM output, and n8n automation pipelines."
+      "Right now I’m building Python agents on top of GPT and Claude APIs, tools for evaluating LLM output, and n8n automation pipelines. I also team up at hackathons: RAKATHON 2026, Huawei Seeds for the Future and the STU Ideathon, where my team placed 3rd."
     ],
     "looking_for": "Internships and junior roles in backend or AI-automation engineering.",
     "languages": []
@@ -58,7 +58,7 @@
     {
       "year": "2026",
       "title": "RAKATHON 2026, Brno",
-      "text": "Team hackathon prototype for the Masaryk Memorial Cancer Institute challenge.",
+      "text": "Team prototype that fills REDCap documentation and flags errors in a urologist’s records.",
       "project": "prostapaper"
     },
     {
@@ -464,9 +464,9 @@
       "layer": "apps",
       "color": "lilac",
       "year": "2026",
-      "outcome": "A hackathon prototype that turns pathology reports into registry records a clinician can review",
-      "subtitle": "From pathology documents to a reviewable registry record.",
-      "summary": "A team hackathon prototype built at RAKATHON 2026 in Brno: it proposes structured values from pathology documents and tumour diagrams, and shows them next to the source for a clinician to confirm before registry export.",
+      "outcome": "A RAKATHON prototype that fills a urologist’s REDCap documentation from his records — and flags the errors it finds",
+      "subtitle": "Reads clinical records, fills REDCap and flags inconsistencies.",
+      "summary": "Built by our team at RAKATHON 2026 in Brno, billed as the world’s largest AI hackathon against cancer. A urologist treating prostate cancer needed a tool that reads his records, compares them, fills the hospital’s REDCap documentation — and points out errors and contradictions in the records.",
       "role": null,
       "team": "Team project",
       "repo": null,
@@ -474,48 +474,51 @@
       "stack": [
         "Document processing",
         "LLM extraction",
+        "Cross-document checks",
         "Human-in-the-loop review",
-        "REDCap export",
-        "On-premises design"
+        "REDCap"
       ],
       "metrics": [],
       "media": {
         "kind": "diagram",
         "diagram": "document-review",
-        "alt": "Illustration: a source pathology report on the left with highlighted passages, and proposed registry fields on the right waiting for a clinician to confirm or edit."
+        "alt": "Illustration: a doctor's record on the left with highlighted passages, and the proposed REDCap form on the right, where one field is flagged because two sources disagree."
       },
       "gallery": [],
       "media_note": "Illustration with generic placeholder fields. No patient data is shown anywhere on this site.",
-      "problem": "Information in pathology reports and tumour diagrams has to be copied into consistent registry fields by hand. The challenge from the Masaryk Memorial Cancer Institute was to speed this up without taking the clinician out of the loop.",
+      "problem": "A urologist treating prostate cancer copies information from his own reports, notes and diagrams into the hospital’s REDCap registry by hand. It takes time, and mistakes in the source records travel straight into the database.",
       "implementation": [
-        "A document → proposed record workflow: values are extracted and suggested, never written to the registry automatically.",
-        "A review screen that shows each proposed value next to the passage it came from.",
-        "Explicit handling of corrections and conflicting information before a record is confirmed.",
-        "An architecture meant for hospital-controlled servers, so documents are processed locally."
+        "Reads the doctor’s records — reports, notes and tumour diagrams — and extracts the value each REDCap field needs.",
+        "Compares the documents with each other, so every value is checked against all of its sources.",
+        "Flags errors and contradictions in the records and shows the doctor exactly where they are. This was the key feature.",
+        "Fills the REDCap form as a proposal: nothing is saved until the doctor reviews and confirms it.",
+        "Designed to run on hospital-controlled servers, so documents never leave the institution."
       ],
       "architecture": [
-        "Input documents",
-        "Extract proposals",
-        "Clinician review",
-        "Registry export"
+        "Read the records",
+        "Extract and cross-check values",
+        "Flag errors for the doctor",
+        "Doctor reviews and confirms",
+        "Export to REDCap"
       ],
       "facts": [
         {
           "label": "Event",
           "items": [
             "RAKATHON 2026",
-            "Brno"
+            "Brno, October 2026"
           ]
         },
         {
-          "label": "Challenge by",
+          "label": "Key feature",
           "items": [
-            "Masaryk Memorial Cancer Institute"
+            "Error detection",
+            "flags contradictions for the doctor"
           ]
         }
       ],
-      "results": "Team prototype presented at RAKATHON 2026. Production deployment and live registry integration would be separate validation steps.",
-      "learning": "In medical document workflows, automation is only useful with a clear review surface and a visible path back to the source."
+      "results": "Team prototype presented at RAKATHON 2026 in Brno. Using it on real patient records would need clinical validation and an approved hospital deployment.",
+      "learning": "In medical documentation, catching mistakes in the source records matters as much as filling the form — and the doctor has to stay in control of every value."
     },
     {
       "id": "secded",
@@ -741,6 +744,50 @@
       "facts": [],
       "results": "Public repository with an environment checker and setup guide. Full operation needs DaVinci Resolve and a local media library.",
       "learning": "Visible intermediate files make an automated pipeline editable: you can inspect and fix the plan before anything is rendered."
+    }
+  ],
+  "hackathons": [
+    {
+      "id": "ideathon",
+      "event": "STU Ideathon",
+      "where": "Slovak University of Technology",
+      "year": null,
+      "result": "3rd place",
+      "team": "Randomly formed team",
+      "title": "A digital twin that finds where university heating is wasted",
+      "summary": "Our faculties spend hundreds of thousands of euros a year on heating. We proposed a sensor network that collects data over a measurement period, builds a digital twin of the buildings and uses it to find where heat is lost or spent at the wrong time.",
+      "points": [
+        "Count body heat: each person in a room gives off around 100 W, so a full lecture hall can be pre-heated about 1 °C lower.",
+        "Heat by the timetable: warm a room for the classes actually scheduled in it, not on a fixed clock.",
+        "Shift heating to the night where the building can store it.",
+        "Heat only the rooms in use at a given time, not the whole building."
+      ],
+      "project": null
+    },
+    {
+      "id": "rakathon",
+      "event": "RAKATHON 2026",
+      "where": "Brno, Masaryk Memorial Cancer Institute",
+      "year": "October 2026",
+      "result": null,
+      "team": "Team project",
+      "note": "Billed as the world’s largest AI hackathon against cancer.",
+      "title": "ProstaPaper: REDCap documentation that checks itself",
+      "summary": "A urologist treating prostate cancer needed a tool that reads his records, compares them, fills the hospital’s REDCap documentation — and, most importantly, finds errors in the records and points them out to him.",
+      "points": [],
+      "project": "prostapaper"
+    },
+    {
+      "id": "seeds",
+      "event": "Huawei Seeds for the Future",
+      "where": null,
+      "year": null,
+      "result": null,
+      "team": "Team project",
+      "title": "An AI hub for smart devices",
+      "summary": "A hub that connects many different smart devices, organises the data exchange between them and uses AI to improve how they work together.",
+      "points": [],
+      "project": null
     }
   ]
 }
