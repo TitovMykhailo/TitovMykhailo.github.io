@@ -1,55 +1,56 @@
 'use strict';
+// Progressive enhancement only: every page works without JavaScript.
 
-// Progressive enhancement: all project text and links exist in the HTML.
-const filterButtons = document.querySelectorAll('[data-filter]');
-filterButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    const category = button.dataset.filter;
-    let count = 0;
-    filterButtons.forEach(item => {
-      const active = item === button;
-      item.classList.toggle('active', active);
-      item.setAttribute('aria-pressed', String(active));
-    });
-    document.querySelectorAll('[data-category]').forEach(project => {
-      project.hidden = category !== 'all' && project.dataset.category !== category;
-      if (!project.hidden) count++;
-    });
-    const announcement = document.getElementById('filter-status');
-    if (announcement) announcement.textContent = `Showing ${count} ${count === 1 ? 'project' : 'projects'}.`;
+// Header gets a hairline once the page scrolls.
+const header = document.querySelector('.site-header');
+if (header) {
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+// Highlight the nav item (home page) or table-of-contents item (case pages)
+// for the section currently in view.
+function trackSections(links, getTarget) {
+  if (!('IntersectionObserver' in window) || !links.length) return;
+  const map = new Map();
+  links.forEach(link => {
+    const target = getTarget(link);
+    if (target) map.set(target, link);
   });
-});
+  const visible = new Set();
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => (entry.isIntersecting ? visible.add(entry.target) : visible.delete(entry.target)));
+    const first = [...map.keys()].find(section => visible.has(section));
+    links.forEach(link => link.classList.toggle('active', first ? map.get(first) === link : false));
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  map.forEach((_, section) => observer.observe(section));
+}
 
+const isHome = !!document.querySelector('.hero');
+if (isHome) {
+  trackSections([...document.querySelectorAll('.site-nav a[href^="#"]')], link => document.querySelector(link.getAttribute('href')));
+}
+trackSections([...document.querySelectorAll('.toc a')], link => document.querySelector(link.getAttribute('href')));
+
+// Copy email.
 document.querySelectorAll('[data-copy-email]').forEach(button => {
   button.addEventListener('click', async () => {
-    const announcement = document.getElementById('copy-status');
+    const status = document.getElementById('copy-status');
+    const email = button.dataset.copyEmail;
     try {
-      await navigator.clipboard.writeText(button.dataset.copyEmail);
-      if (announcement) announcement.textContent = 'Email address copied.';
+      await navigator.clipboard.writeText(email);
+      if (status) status.textContent = `Copied ${email} to the clipboard.`;
+      button.textContent = 'Copied';
+      setTimeout(() => { button.textContent = 'Copy email'; }, 2400);
     } catch {
-      if (announcement) announcement.textContent = `Copy this address: ${button.dataset.copyEmail}`;
+      if (status) status.textContent = `Couldn’t copy automatically. The address is ${email}.`;
     }
   });
 });
 
-document.querySelectorAll('[data-print]').forEach(button => {
-  button.addEventListener('click', () => window.print());
-});
+// Print (resume page).
+document.querySelectorAll('[data-print]').forEach(button => button.addEventListener('click', () => window.print()));
 
-// Never hide content unless observation is supported. Reduced motion stays static.
-if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.06 });
-  document.documentElement.classList.add('reveal-ready');
-  document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
-}
-
-document.querySelectorAll('[data-year]').forEach(element => {
-  element.textContent = String(new Date().getFullYear());
-});
+// Keep the footer year current.
+document.querySelectorAll('[data-year]').forEach(el => { el.textContent = String(new Date().getFullYear()); });
