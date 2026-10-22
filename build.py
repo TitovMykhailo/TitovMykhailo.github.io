@@ -433,43 +433,78 @@ def build_project(p, i):
     (ROOT / 'projects' / f"{p['id']}.html").write_text(out, encoding='utf-8')
 
 
-# ---------------------------------------------------------------- resume
+# ---------------------------------------------------------------- CV
+# resume.html (public) and tailored variants such as cv/treehacks.html (unlisted).
+# make_assets.py prints each variant to its PDF.
+
+def cv_project(p):
+    layer = layer_of(p)
+    src = f' · <a href="{e(p["repo"])}">{e(p["repo"].replace("https://", ""))}</a>' if p['repo'] else ''
+    points = ''.join(f'<li>{e(x)}</li>' for x in p['cv_points'])
+    return f'''<li class="cv-item"><div class="cv-row"><h3>{e(p['title'])}</h3><span class="cv-tag tint-{e(layer['color'])}">{e(layer['name'])}</span><span class="cv-year">{e(p['year'])}</span></div>
+<p class="cv-outcome">{e(p['outcome'])}.</p><ul class="cv-points">{points}</ul><p class="cv-foot">{e(', '.join(p['stack'][:5]))}{src}</p></li>'''
+
+
+def cv_hackathon(h):
+    badge = f'<span class="cv-badge">{e(h["result"])}</span>' if h.get('result') else ''
+    return f'''<li class="cv-item"><div class="cv-row"><h3>{e(h['event'])}</h3>{badge}<span class="cv-year">{e(h.get('year') or '')}</span></div>
+<p class="cv-text">{e(h['cv'])}</p></li>'''
+
+
+def cv_sections(v):
+    out = {}
+    out['projects'] = f'<section class="cv-section"><h2>{e(v["projects_title"])}</h2><ul class="cv-list">{"".join(cv_project(P[i]) for i in v["projects"])}</ul></section>'
+    out['hackathons'] = f'<section class="cv-section"><h2>Hackathons</h2><ul class="cv-list">{"".join(cv_hackathon(h) for h in C.get("hackathons", []))}</ul></section>'
+    out['more'] = '<section class="cv-section"><h2>More projects</h2><ul class="cv-more">' + ''.join(
+        f'<li><b>{e(P[i]["title"])}</b> — {e(P[i]["subtitle"])}</li>' for i in v['more']) + '</ul></section>'
+    return ''.join(out[k] for k in v['order'])
+
+
+def cv_sidebar(v):
+    a = C['about']
+    blocks = {}
+    blocks['education'] = '<div class="cv-block"><h2>Education</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(x["school"])}</b><span>{e(x["program"])}{(", " + e(x["years"])) if x.get("years") else ""}</span></li>' for x in C['education']) + '</ul></div>'
+    blocks['skills'] = '<div class="cv-block"><h2>Skills</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(g["group"])}</b><span>{e(", ".join(g["items"]))}</span></li>' for g in C['toolbox']) + '</ul></div>'
+    blocks['languages'] = ('<div class="cv-block"><h2>Languages</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(l["name"])}</b><span>{e(l["level"])}</span></li>' for l in a['languages']) + '</ul></div>') if a.get('languages') else ''
+    blocks['now'] = (f'<div class="cv-block"><h2>Right now</h2><p class="cv-now">{e(v["now"])}</p></div>') if v.get('now') else ''
+    blocks['tools'] = ('<div class="cv-block"><h2>Tools</h2><ul class="cv-chips">' + ''.join(f'<li>{e(x)}</li>' for x in v['tools']) + '</ul></div>') if v.get('tools') else ''
+    blocks['team'] = ('<div class="cv-block"><h2>What I bring</h2><ul class="cv-plain">' + ''.join(
+        f'<li><b>{e(t["title"])}</b><span>{e(t["text"])}</span></li>' for t in v['team']) + '</ul></div>') if v.get('team') else ''
+    blocks['tracks'] = ('<div class="cv-block"><h2>Tracks I’d build for</h2><ul class="cv-chips">' + ''.join(
+        f'<li>{e(t)}</li>' for t in v['tracks']) + '</ul></div>') if v.get('tracks') else ''
+    return ''.join(blocks[k] for k in v['sidebar'])
+
+
+def cv_article(v):
+    site = SITE.replace('https://', '')
+    layers = ''.join(f'<span class="tint-{e(l["color"])}">{e(l["name"])}</span>' for l in reversed(C['layers']))
+    return f'''<article class="cv" aria-label="Resume of {e(C['name'])}">
+<header class="cv-head"><div class="cv-id"><span class="cv-mark" aria-hidden="true">{e(C['initials'])}</span><div><h1>{e(C['name'])}</h1><p class="cv-headline">{e(v['headline'])}</p></div></div>
+<ul class="cv-contacts"><li><a href="mailto:{e(C['email'])}">{e(C['email'])}</a></li><li><a href="{e(SITE)}">{e(site)}</a></li><li><a href="{e(C['github'])}">{e(C['github'].replace('https://', ''))}</a></li><li><a href="{e(C['linkedin'])}">{e(C['linkedin'].replace('https://www.', ''))}</a></li><li>{e(C['location'])}</li></ul></header>
+<div class="cv-layers" aria-hidden="true">{layers}</div>
+<div class="cv-body"><div class="cv-main"><section class="cv-section"><h2>Profile</h2><p class="cv-profile">{e(v['profile'])}</p></section>{cv_sections(v)}</div>
+<aside class="cv-side">{cv_sidebar(v)}</aside></div>
+</article>'''
+
 
 def build_resume():
-    a = C['about']
-    def proj_line(p):
-        m = '; '.join(f'{x["value"]} {x["label"]}' for x in p['metrics'] if not re.search(r'(?<![\d.])' + re.escape(x['value']) + r'(?!\d)', p['outcome']))
-        return f'''<li><div class="cv-row"><b>{e(p['title'])}</b><span>{e(p['year'])}</span></div><p>{e(p['outcome'])}.{(' ' + e(m) + '.') if m else ''}</p><p class="cv-stack">{e(', '.join(p['stack'][:6]))}</p></li>'''
-    others = [p for p in PROJECTS if p not in FEATURED]
-    def cv_hack(h):
-        if h.get('project'):
-            return f'{e(h["title"])} (see Selected projects).'
-        if h.get('points'):
-            return f'{e(h["title"])}. {e(h["summary"].split(". ")[-1])}'
-        return e(h['summary'])
-    skills = ''.join(f'<li><b>{e(g["group"])}</b><span>{e(", ".join(g["items"]))}</span></li>' for g in C['toolbox'])
-    edu = ''.join(f'<li><div class="cv-row"><b>{e(x["school"])}</b><span>{e(x["years"] or "")}</span></div><p>{e(x["program"])}</p></li>' for x in C['education'])
-    langs = ''
-    if a.get('languages'):
-        langs = '<section><h2>Languages</h2><p>' + ', '.join(f'{e(l["name"])} ({e(l["level"])})' for l in a['languages']) + '</p></section>'
-    out = head(f"Resume — {C['name']}", f"Resume of {C['name']}, {C['role']} in Bratislava.", '', 'resume.html')
-    out += header('', 'resume', home='index.html')
-    out += f'''<main id="main" class="resume-page"><div class="wrap">
-<div class="resume-tools"><p>A one-page summary. The PDF has the same content.</p><div><a class="btn btn-dark" href="{e(C['cv_pdf'])}" download>Download PDF</a><button class="btn btn-outline" type="button" data-print>Print</button></div></div>
-<article class="cv">
-<header class="cv-head"><div><h1>{e(C['name'])}</h1><p class="cv-role">{e(C['role'])}, {e(C['location'])}</p></div>
-<ul class="cv-contacts"><li><a href="mailto:{e(C['email'])}">{e(C['email'])}</a></li><li><a href="{e(SITE)}">{e(SITE.replace('https://', ''))}</a></li><li><a href="{e(C['github'])}">{e(C['github'].replace('https://', ''))}</a></li><li><a href="{e(C['linkedin'])}">{e(C['linkedin'].replace('https://www.', ''))}</a></li></ul></header>
-<section><h2>Profile</h2><p>{e(a['bio'][0])} {e(a['bio'][2].split('. I also')[0].rstrip('.'))}. {e(a['looking_for'])}</p></section>
-<section><h2>Education</h2><ul class="cv-list">{edu}</ul></section>
-<section><h2>Selected projects</h2><ul class="cv-list">{''.join(proj_line(p) for p in FEATURED)}</ul></section>
-<section><h2>Hackathons</h2><ul class="cv-list cv-compact">{''.join(f'<li><div class="cv-row"><b>{e(h["event"])}{(" — " + e(h["result"])) if h.get("result") else ""}</b><span>{e(h.get("year") or "")}</span></div><p>{cv_hack(h)}</p></li>' for h in C.get('hackathons', []))}</ul></section>
-<section><h2>More projects</h2><ul class="cv-list cv-compact">{''.join(f'<li><p><b class="cv-ink">{e(p["title"])}</b> — {e(p["outcome"])}.</p></li>' for p in others)}</ul></section>
-<section><h2>Skills</h2><ul class="cv-skills">{skills}</ul></section>
-{langs}
-</article>
-</div></main>'''
-    out += footer()
-    (ROOT / 'resume.html').write_text(out, encoding='utf-8')
+    for key, v in C['cv_variants'].items():
+        depth = v['page'].count('/')
+        prefix = '../' * depth
+        tools = f'<div class="resume-tools"><p>{"One page. The PDF has the same content." if key == "main" else "Tailored resume. The PDF has the same content."}</p><div><a class="btn btn-dark" href="{prefix}{e(v["pdf"])}" download>Download PDF</a><button class="btn btn-outline" type="button" data-print>Print</button></div></div>'
+        if key == 'main':
+            out = head(f"Resume — {C['name']}", f"Resume of {C['name']}, {C['role']} in Bratislava.", prefix, v['page'])
+            out += header(prefix, 'resume', home=f'{prefix}index.html')
+            out += f'<main id="main" class="resume-page"><div class="wrap">{tools}{cv_article(v)}</div></main>' + footer(prefix)
+        else:
+            out = head(f"Resume — {C['name']}", f"Resume of {C['name']}.", prefix, v['page'], extra='\n<meta name="robots" content="noindex">')
+            out += f'<main id="main" class="resume-page resume-solo"><div class="wrap">{tools}{cv_article(v)}</div></main></body></html>'
+        target = ROOT / v['page']
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(out, encoding='utf-8')
 
 
 # ---------------------------------------------------------------- extras

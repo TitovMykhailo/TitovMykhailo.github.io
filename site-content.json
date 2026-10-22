@@ -284,7 +284,11 @@
       ],
       "facts": [],
       "results": "A complete, runnable application: one `docker compose up` starts PostgreSQL, the backend and the frontend. Stored “Java logic” in widgets is validated but never executed on the server, and “Generate with AI” is a rule-based UI mock.",
-      "learning": "Designing the widget system taught me to keep extensibility safe: user-defined content is stored and validated, but the server never runs it."
+      "learning": "Designing the widget system taught me to keep extensibility safe: user-defined content is stored and validated, but the server never runs it.",
+      "cv_points": [
+        "Spring Boot 3 + JWT backend: 35 REST endpoints, Flyway migrations, integration tests.",
+        "React dashboard with drag-and-resize widgets, analytics charts and time tracking."
+      ]
     },
     {
       "id": "kizuna",
@@ -378,7 +382,11 @@
         }
       ],
       "results": "Public repository with the protocol core, a reproducible 12-node lab and a dashboard. The test suite (167 tests) passes on a clean checkout. The roadmap now turns the lab protocol into a real Linux overlay with a `kiz0` TUN interface.",
-      "learning": "Separating the protocol core from the simulator, collector and dashboard made each layer testable on its own — and made it possible to boot the daemon on a real node without the simulator."
+      "learning": "Separating the protocol core from the simulator, collector and dashboard made each layer testable on its own — and made it possible to boot the daemon on a real node without the simulator.",
+      "cv_points": [
+        "Binary protocol over UDP/IPv6 multicast with neighbor admission and backup paths.",
+        "12-node Docker lab with fault injection and gateway failover; 167 passing tests."
+      ]
     },
     {
       "id": "clinic",
@@ -456,7 +464,11 @@
         "width": 1600,
         "height": 1000,
         "alt": "Doctor portal dashboard with counters for today, this week, completed appointments and chat threads, a recent-appointments table and quick actions."
-      }
+      },
+      "cv_points": [
+        "Slot generation from doctor schedules with conflict checks; three user roles.",
+        "Each booking opens a STOMP/WebSocket chat with the doctor’s automatic message."
+      ]
     },
     {
       "id": "prostapaper",
@@ -518,7 +530,11 @@
         }
       ],
       "results": "Team prototype presented at RAKATHON 2026 in Brno. Using it on real patient records would need clinical validation and an approved hospital deployment.",
-      "learning": "In medical documentation, catching mistakes in the source records matters as much as filling the form — and the doctor has to stay in control of every value."
+      "learning": "In medical documentation, catching mistakes in the source records matters as much as filling the form — and the doctor has to stay in control of every value.",
+      "cv_points": [
+        "Reads a urologist’s records, cross-checks values and fills REDCap forms.",
+        "Flags contradictions in the records for the doctor before anything is saved."
+      ]
     },
     {
       "id": "secded",
@@ -571,7 +587,11 @@
         }
       ],
       "results": "Research in progress. The source and measured BER curves are not public yet.",
-      "learning": "Testbenches and controlled experiments are how a decoder proves it is correct — and show exactly where it starts to fail."
+      "learning": "Testbenches and controlled experiments are how a decoder proves it is correct — and show exactly where it starts to fail.",
+      "cv_points": [
+        "Extended Hamming (8,4) encoder and decoder in Verilog with hybrid correction.",
+        "BPSK + AWGN simulation comparing bit-error rates across an Eb/N0 sweep."
+      ]
     },
     {
       "id": "study-group",
@@ -631,7 +651,11 @@
       ],
       "facts": [],
       "results": "Public source with local startup and cloud deployment instructions. This site doesn’t claim a production deployment is currently online.",
-      "learning": "Mixing request/response APIs with realtime events forced clear rules about what the server broadcasts and when the client refetches."
+      "learning": "Mixing request/response APIs with realtime events forced clear rules about what the server broadcasts and when the client refetches.",
+      "cv_points": [
+        "Realtime WebSocket chat linked to group tasks and shared files.",
+        "JWT + Google OAuth2; deployment config for Cloud Run, Cloud SQL and Storage."
+      ]
     },
     {
       "id": "job-hunter",
@@ -689,7 +713,11 @@
       ],
       "facts": [],
       "results": "Public Python project. It runs on a schedule with configured API keys; Gmail reply checking is currently disabled, and it never applies to jobs on its own.",
-      "learning": "Cheap deterministic filters in front of the model cut both cost and noise — the model only judges listings that could plausibly fit."
+      "learning": "Cheap deterministic filters in front of the model cut both cost and noise — the model only judges listings that could plausibly fit.",
+      "cv_points": [
+        "Collects listings from five job boards and filters noise before any model call.",
+        "Azure OpenAI scores each listing 0–10; anything 7+ goes to a Google Sheets shortlist."
+      ]
     },
     {
       "id": "video-editor",
@@ -743,7 +771,11 @@
       ],
       "facts": [],
       "results": "Public repository with an environment checker and setup guide. Full operation needs DaVinci Resolve and a local media library.",
-      "learning": "Visible intermediate files make an automated pipeline editable: you can inspect and fix the plan before anything is rendered."
+      "learning": "Visible intermediate files make an automated pipeline editable: you can inspect and fix the plan before anything is rendered.",
+      "cv_points": [
+        "Transcribes a voiceover, trims silences and filler words, writes synced captions.",
+        "Picks clips and sound, grades colour and builds a DaVinci Resolve timeline."
+      ]
     }
   ],
   "hackathons": [
@@ -762,7 +794,8 @@
         "Shift heating to the night where the building can store it.",
         "Heat only the rooms in use at a given time, not the whole building."
       ],
-      "project": null
+      "project": null,
+      "cv": "Sensors and a digital twin to cut faculty heating costs: body-heat-aware pre-heating, timetable-based and room-level heating."
     },
     {
       "id": "rakathon",
@@ -775,7 +808,8 @@
       "title": "ProstaPaper: REDCap documentation that checks itself",
       "summary": "A urologist treating prostate cancer needed a tool that reads his records, compares them, fills the hospital’s REDCap documentation — and, most importantly, finds errors in the records and points them out to him.",
       "points": [],
-      "project": "prostapaper"
+      "project": "prostapaper",
+      "cv": "ProstaPaper: reads a urologist’s records, fills REDCap documentation and flags errors for the doctor."
     },
     {
       "id": "seeds",
@@ -787,7 +821,112 @@
       "title": "An AI hub for smart devices",
       "summary": "A hub that connects many different smart devices, organises the data exchange between them and uses AI to improve how they work together.",
       "points": [],
-      "project": null
+      "project": null,
+      "cv": "A hub that connects smart devices, organises their data exchange and uses AI to improve how they work."
     }
-  ]
+  ],
+  "cv_variants": {
+    "main": {
+      "page": "resume.html",
+      "pdf": "assets/Mykhailo_Titov_CV.pdf",
+      "headline": "Software engineer & ICT student",
+      "profile": "ICT student at STU FEI in Bratislava, with a parallel Computer Science degree at Dnipro University of Technology. I build across the stack: Spring Boot backends, React frontends, an IPv6 mesh-routing protocol, a Verilog decoder and Python agents on LLM APIs. Looking for internships and junior roles in backend or AI-automation engineering.",
+      "order": [
+        "projects",
+        "hackathons",
+        "more"
+      ],
+      "projects": [
+        "task-tracker",
+        "kizuna",
+        "clinic"
+      ],
+      "more": [
+        "job-hunter",
+        "video-editor",
+        "study-group",
+        "secded"
+      ],
+      "projects_title": "Selected projects",
+      "sidebar": [
+        "now",
+        "education",
+        "skills",
+        "languages"
+      ],
+      "now": "Building Python agents on GPT and Claude APIs, tools for evaluating LLM output, and n8n automation pipelines."
+    },
+    "treehacks": {
+      "page": "cv/treehacks.html",
+      "pdf": "assets/Mykhailo_Titov_CV_TreeHacks.pdf",
+      "headline": "Hackathon builder, from hardware to AI",
+      "profile": "I build across the whole stack — Verilog, network protocols, Spring Boot APIs and LLM agents — and I like building fast, in a team. At hackathons I’ve built for healthcare (RAKATHON 2026), sustainability (STU Ideathon, 3rd place) and smart devices (Huawei Seeds for the Future). At TreeHacks 2027 I want to build for AI Edge, Healthcare or Sustainability.",
+      "order": [
+        "hackathons",
+        "projects",
+        "more"
+      ],
+      "projects": [
+        "kizuna",
+        "job-hunter",
+        "task-tracker"
+      ],
+      "more": [
+        "video-editor",
+        "clinic",
+        "study-group",
+        "secded"
+      ],
+      "projects_title": "Things I’ve built",
+      "sidebar": [
+        "team",
+        "tracks",
+        "tools",
+        "education",
+        "languages"
+      ],
+      "team": [
+        {
+          "title": "Backend & APIs",
+          "text": "Java, Spring Boot, REST, WebSockets, PostgreSQL"
+        },
+        {
+          "title": "AI agents",
+          "text": "Python, LLM APIs, scoring and evaluation pipelines"
+        },
+        {
+          "title": "Networks & devices",
+          "text": "IPv6 mesh routing, Docker labs, smart-device hubs"
+        },
+        {
+          "title": "Frontend",
+          "text": "React, TypeScript, dashboards"
+        },
+        {
+          "title": "Hardware & signals",
+          "text": "Verilog, testbenches, channel modelling"
+        }
+      ],
+      "tracks": [
+        "AI Edge",
+        "Healthcare",
+        "Sustainability"
+      ],
+      "tools": [
+        "Python",
+        "Java",
+        "Spring Boot",
+        "React",
+        "TypeScript",
+        "PostgreSQL",
+        "Docker",
+        "Azure OpenAI",
+        "Claude API",
+        "n8n",
+        "Verilog",
+        "Linux",
+        "Git"
+      ]
+    }
+  }
 }

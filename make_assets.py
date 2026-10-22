@@ -52,14 +52,20 @@ async def main():
             await icon.wait_for_timeout(300)
             await icon.screenshot(path=str(ROOT / 'assets' / 'apple-touch-icon.png'))
 
-            cv = await browser.new_page()
-            await cv.goto((ROOT / 'resume.html').as_uri())
-            await cv.wait_for_timeout(500)
-            await cv.pdf(path=str(ROOT / C['cv_pdf']), format='A4', print_background=True, prefer_css_page_size=True)
+            for key, v in C['cv_variants'].items():
+                cv = await browser.new_page()
+                await cv.goto((ROOT / v['page']).as_uri())
+                await cv.emulate_media(media='print')
+                await cv.wait_for_timeout(500)
+                overflow = await cv.evaluate("(() => { const a = document.querySelector('.cv'); return a.scrollHeight - a.clientHeight; })()")
+                if overflow > 1:
+                    print(f'WARNING: {key} CV overflows the A4 page by {overflow}px; shorten its content.')
+                await cv.pdf(path=str(ROOT / v['pdf']), format='A4', print_background=True, prefer_css_page_size=True)
+                print('Wrote', v['pdf'])
             await browser.close()
     finally:
         tmp.unlink(missing_ok=True)
-    print('Wrote assets/og-image.png, assets/apple-touch-icon.png and', C['cv_pdf'])
+    print('Wrote assets/og-image.png and assets/apple-touch-icon.png')
 
 
 if __name__ == '__main__':
